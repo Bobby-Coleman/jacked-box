@@ -9,7 +9,7 @@ export const LINES = {
   ],
   'room.pick': [
     'Pick a game, V.I.P. Everybody is waiting. No pressure.',
-    "V.I.P., the games are on your phone. Choose wisely. Or don't. I'm a box.",
+    "V.I.P., the games are on your phone. Choose wisely. Or don't. [chuckle] I'm a box.",
   ],
   'results.champ': [
     '{name}, you win! Take a bow. Or flex. Flexing is also acceptable.',
@@ -19,7 +19,7 @@ export const LINES = {
   'results.winner': [
     "And there's our champion! Take a bow. Or flex. Flexing is also acceptable.",
     'We have a winner! Everyone else, hit the showers.',
-    'Winner, winner! I would hug you, but I have no arms. Just cardboard and dreams.',
+    'Winner, winner! [laugh] I would hug you, but I have no arms. Just cardboard and dreams.',
   ],
   'gen.hurry': ['Ten seconds left!', 'Ten seconds! Hurry it up!', 'Clock is ticking. Ten seconds!'],
   'gen.timeup': ["Time's up!", 'Pencils down! Phones down! Everything down!'],
@@ -35,7 +35,7 @@ export const LINES = {
   'zinger.round2': ['Round two! Every point is doubled.', 'Round two. Double points. Double the pain.'],
   'zinger.vote': ['Vote for your favorite!', 'Which one hits harder? Vote!', 'Pick a winner!'],
   'zinger.ko': ['Zinger! Total knockout!', 'Knockout! That one got every vote!', 'Flawless victory! A clean sweep!'],
-  'zinger.jinx': ['Jinx! Same answer. Nobody scores.', 'Jinx! Great minds think alike. Boring minds too.'],
+  'zinger.jinx': ['Jinx! Same answer. Nobody scores.', 'Jinx! Great minds think alike. [chuckle] Boring minds too.'],
   'zinger.final': ['Final round! Everybody answers the same prompt.', "It's the final round. One prompt. Everybody's in the ring."],
   'zinger.finalvote': ['Pick your two favorites. You cannot vote for yourself. I checked.'],
 
@@ -47,7 +47,7 @@ export const LINES = {
   'fib.lie': ['Write a believable lie.', 'Make something up. Make it convincing.', 'Lie to your friends. I believe in you.'],
   'fib.choose': ['Now find the truth.', 'One of these is real. Which one?', 'Pick the truth. Avoid the lies.'],
   'fib.truth': ['And the truth is...', 'The real answer is...', 'Believe it or not, the truth is...'],
-  'fib.nobody': ['Nobody found the truth. Embarrassing for everyone.', 'Wow. Not one of you. Incredible.'],
+  'fib.nobody': ['Nobody found the truth. Embarrassing for everyone.', '[sigh] Wow. Not one of you. Incredible.'],
   'fib.about': ["This one's about one of you.", 'Time to get personal.'],
   'fib.round2': ['Round two! Points are doubled.'],
   'fib.final': ['Final fib! Triple points!'],
@@ -85,7 +85,7 @@ export const LINES = {
   'blend.vote': ['Vote now! Who is the Chameleon?', 'Point the finger! Vote on your phone.'],
   'blend.caught': ['Caught you! But can you guess the word?', 'Busted! Chameleon, one last chance. Guess the word.'],
   'blend.escaped': ['The Chameleon got away!', 'Nope! Wrong person. The Chameleon escapes!'],
-  'blend.win': ['The Chameleon guessed it! Sneaky.', 'Unbelievable. The Chameleon knew all along.'],
+  'blend.win': ['The Chameleon guessed it! Sneaky.', '[gasp] Unbelievable. The Chameleon knew all along.'],
   'blend.lose': ['Wrong word! The table wins this round.', "The Chameleon had no clue. Table wins!"],
 
   // Mind Dial
@@ -136,7 +136,7 @@ export const LINES = {
   'dead.math': ["Quick math! Get one wrong and you're done."],
   'dead.memory': ['Memorize the reps. Then repeat them exactly.'],
   'dead.taps': ['Tap as fast as you can when I say go. Do not stop!'],
-  'dead.died': ['Rest in reps.', "Ooh. That's a ghost now.", 'Welcome to the afterlife. The showers are cold.'],
+  'dead.died': ['Rest in reps.', "Ooh. [chuckle] That's a ghost now.", 'Welcome to the afterlife. The showers are cold.'],
   'dead.survived': ['Everybody survived! For now.', 'You live to lift another day.'],
   'dead.final': [
     'Final round! Escape the gym. True or false. Every right answer moves you toward the exit. Ghosts start one step behind.',
@@ -160,7 +160,7 @@ export const LINES = {
   ],
   'photo.draw': ['Start drawing! Their faces are on your canvas.', 'Get to work, artists. Your friends are counting on you. Sort of.', 'Draw the scene! Move the faces, add the chaos.'],
   'photo.by': ['A masterpiece by {name}!', 'Next up, a piece by {name}.', 'From the studio of {name}.'],
-  'photo.gallery': ['Welcome to the gallery. Please do not touch the art.', "Gallery time. Let's admire your crimes against art.", 'The exhibit is open!'],
+  'photo.gallery': ['Welcome to the gallery. Please do not touch the art.', "Gallery time. [chuckle] Let's admire your crimes against art.", 'The exhibit is open!'],
   'photo.vote': ['Vote for your two favorites!', 'Pick your two favorite masterpieces.', 'Which ones belong in a museum? Vote!'],
   'photo.reveal': ["Let's see who the critics loved.", 'And the critics have spoken!', 'The votes are in!'],
 
@@ -171,7 +171,7 @@ export const LINES = {
   ],
   'zoom.start': ['Enhance!', 'Zoom in on that!', 'Who is this? Buzz in!', 'Enhance. Enhance. Enhance!'],
   'zoom.reveal': ["It's {name}!", 'Case closed. It was {name}!', 'Identity confirmed: {name}!'],
-  'zoom.nobody': ['Nobody recognized them. Ouch.', 'Not one of you. Do you even know your friends?'],
+  'zoom.nobody': ['Nobody recognized them. Ouch.', '[sigh] Not one of you. Do you even know your friends?'],
 
   // Frankenface
   'frank.intro': [
@@ -203,7 +203,7 @@ export const LINES = {
   'pull.vote': ['Vote for the best face!', 'Which face wins? Vote now.', 'Pick the best performance.'],
   'pull.reveal': ['And the best face goes to...', "We've got a winner! What a face.", 'That face is going in the hall of fame.'],
   'pull.winner': ['{name}, you win the round! What a face.', 'And the best face goes to {name}!'],
-  'pull.nobody': ['No votes? Tough crowd.', 'Nobody voted. Wow.'],
+  'pull.nobody': ['No votes? [sigh] Tough crowd.', 'Nobody voted. Wow.'],
 
   // Art Fraud
   'fraud.intro': [
@@ -225,7 +225,7 @@ export const LINES = {
   ],
   'pants.write': ['Write two truths and a lie.', 'Three facts about you. One is fake. Make it good.'],
   'pants.grill': ['{name}, take the hot seat! Everyone else, start grilling.', '{name}, you are in the hot seat. Everyone, ask questions, then vote.', 'Into the hot seat, {name}!'],
-  'pants.fooled': ['Liar liar, pants on fire!', 'They fooled you! What a liar.', 'Smooth. Very smooth.'],
+  'pants.fooled': ['Liar liar, pants on fire! [laugh]', 'They fooled you! What a liar.', 'Smooth. Very smooth.'],
   'pants.caught': ['Caught! Everyone saw right through that.', 'Busted! Terrible liar.'],
 
   // Split Decision
@@ -235,6 +235,6 @@ export const LINES = {
   ],
   'split.write': ['Write the catch!', 'Make the deal tempting. Then ruin it.', 'Write a catch that splits the room.'],
   'split.perfect': ['A perfect split!', 'Fifty fifty! Beautiful.', 'Right down the middle!'],
-  'split.lopsided': ['Everyone agreed. Zero points.', 'Unanimous! That is the opposite of the point.'],
+  'split.lopsided': ['Everyone agreed. Zero points.', 'Unanimous! [laugh] That is the opposite of the point.'],
   'split.result': ["Let's see the split.", 'The room has spoken.'],
 };

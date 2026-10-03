@@ -2,7 +2,7 @@
 // back to the phone's own text-to-speech only for what can't be pre-rendered: things players
 // typed, like answers and crimes.
 import { getCtx, buses, duck } from './audio.js';
-import { clipName, nameClip, nameFirst, lineSpoken } from './clipname.js';
+import { clipName, nameClips, nameFirst, lineSpoken } from './clipname.js';
 import { LINES } from '../content/voice.js';
 
 let manifest = null; // Set of available clip names
@@ -54,6 +54,15 @@ export async function preloadLines(keys) {
   }
 }
 
+// Warm the players' name clips, so "BOBBY" + "phone on your forehead!" play back to back.
+export async function preloadNames(names) {
+  const m = await loadManifest();
+  for (const n of names) {
+    const c = nameClips(n).find((x) => m.has(x));
+    if (c) getBuffer(c);
+  }
+}
+
 // Robotic or novelty system voices we never want reading answers.
 const ROBOTIC = /espeak|\bfred\b|albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|good news|hysterical|jester|organ|superstar|trinoids|whisper|wobble|zarvox|junior|ralph|kathy|princess|grandma|grandpa|rocko|shelley|sandy|eddy|flo|reed/i;
 const OLD_SAPI = /^microsoft (david|zira|mark|hazel|george|susan|james|catherine|ravi|heera)\b(?!.*(online|natural))/i;
@@ -98,14 +107,16 @@ function clipsFor(cue, m) {
     return m.has(name) ? [name] : null;
   }
   const tpl = (LINES[cue.k] || [])[cue.i] || '';
+  // A line this phone's (older, cached) build doesn't know: just read the caption.
+  if (!tpl) return null;
   const key = `${cue.k}-${cue.i}`;
   const hasLine = !!lineSpoken(tpl);
   if (hasLine && !m.has(key)) return null;
   const parts = hasLine ? [key] : [];
   if (tpl.includes('{name}') && cue.name) {
-    const n = nameClip(cue.name);
+    const n = nameClips(cue.name).find((c) => m.has(c));
     // Names we haven't pre-rendered are left to the caption.
-    if (n && m.has(n)) {
+    if (n) {
       if (nameFirst(tpl)) parts.unshift(n);
       else parts.push(n);
     }

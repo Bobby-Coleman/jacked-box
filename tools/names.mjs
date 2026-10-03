@@ -55,6 +55,16 @@ const SPOKEN = {
   clanky: 'Clanky!',
   deshawn: 'DeShawn!',
   jaxon: 'Jaxon!',
+  dj: 'D J!',
+  aj: 'A J!',
+  cj: 'C J!',
+  jj: 'J J!',
+  tj: 'T J!',
+  pj: 'P J!',
+  rj: 'R J!',
+  mj: 'M J!',
+  kj: 'K J!',
+  jd: 'J D!',
 };
 
 export function nameJobs(nameClip) {

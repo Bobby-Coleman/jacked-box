@@ -19,3 +19,4 @@ tools/tts/.hf/
 tools/tts/audition/
 tools/tts/refs/
 tools/tts/qa-report.json
+voice-samples/

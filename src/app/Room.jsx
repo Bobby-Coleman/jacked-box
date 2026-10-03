@@ -10,7 +10,7 @@ import { GAMES } from '../games/logic.js';
 import { joinUrl, shareLink, copyText } from '../platform.js';
 import { audioPrefs, setAudioPref, isUnlocked, unlock, onAudioState } from '../audio/audio.js';
 import { playMusic, stopMusic } from '../audio/music.js';
-import { playCue, stopVoice, preloadLines } from '../audio/voice.js';
+import { playCue, stopVoice, preloadLines, preloadNames } from '../audio/voice.js';
 import { sfx } from '../audio/sfx.js';
 import { Boxter } from '../ui/Avatar.jsx';
 import { ReactButton, ReactTray, ReactLayer } from './Reactions.jsx';
@@ -374,8 +374,16 @@ function AudioDirector({ s, meId }) {
   useEffect(() => () => stopMusic(), []);
 
   useEffect(() => {
-    if (s.scene === 'game' && s.game) preloadLines([s.game.id + '.', 'gen.']);
+    if (s.scene === 'game' && s.game) preloadLines([s.game.id + '.', 'gen.', 'results.']);
   }, [s.scene, s.game && s.game.id]);
+
+  const names = Object.values(s.players || {})
+    .filter((p) => !p.screen)
+    .map((p) => p.name)
+    .join('|');
+  useEffect(() => {
+    if (isSpeaker && unlocked) preloadNames(names.split('|'));
+  }, [names, isSpeaker, unlocked]);
 
   useEffect(() => {
     const cues = s.cues || [];

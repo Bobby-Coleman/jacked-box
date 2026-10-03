@@ -42,14 +42,13 @@ def words(t):
         w = w.strip("'")
         if not w or w.isdigit() or w in NUMBER_WORDS:
             continue
+        if re.fullmatch(r"(ha)+h?|(he)+h?|hm+|uh+|um+|ah+|oh+|ooh+", w):  # laughs, sighs, gasps
+            continue
         out.append(w)
     return out
 
 
-def wer(ref, hyp):
-    r, h = words(ref), words(hyp)
-    if not r:
-        return 0.0
+def _edits(r, h):
     d = list(range(len(h) + 1))
     for i in range(1, len(r) + 1):
         prev, d[0] = d[0], i
@@ -57,7 +56,17 @@ def wer(ref, hyp):
             cur = d[j]
             d[j] = min(d[j] + 1, d[j - 1] + 1, prev + (r[i - 1] != h[j - 1]))
             prev = cur
-    return d[len(h)] / len(r)
+    return d[len(h)]
+
+
+def wer(ref, hyp):
+    """Letter-level error rate, ignoring spaces and punctuation, so harmless spelling
+    differences ("Knock out" vs "Knockout", "Jackbox" vs "Jacked Box") barely count but a
+    skipped or garbled phrase does."""
+    r, h = "".join(words(ref)), "".join(words(hyp))
+    if not r:
+        return 0.0
+    return _edits(r, h) / len(r)
 
 
 def trim(y, sr, thr=0.02):
@@ -93,12 +102,12 @@ class Checker:
     def __init__(self, device):
         from transformers import pipeline
 
-        self.asr = pipeline(
-            "automatic-speech-recognition",
-            model="openai/whisper-base.en",
-            device=0 if device == "cuda" else -1,
-            torch_dtype=torch.float16 if device == "cuda" else torch.float32,
-        )
+        kw = dict(model="openai/whisper-base.en", device=0 if device == "cuda" else -1)
+        dt = torch.float16 if device == "cuda" else torch.float32
+        try:
+            self.asr = pipeline("automatic-speech-recognition", dtype=dt, **kw)
+        except TypeError:  # older transformers
+            self.asr = pipeline("automatic-speech-recognition", torch_dtype=dt, **kw)
 
     def text(self, y, sr):
         y16 = librosa.resample(y, orig_sr=sr, target_sr=16000)
@@ -115,7 +124,7 @@ class Checker:
         w = wer(job["text"], hyp)
         too_long = dur > max(2.2 * exp, exp + 2.5)
         too_short = dur < 0.35 * exp
-        limit = 0.15 if len(words(job["text"])) >= 6 else 0.34
+        limit = 0.12 if len(words(job["text"])) >= 6 else 0.25
         ok = w <= limit and not too_long and not too_short
         score = w + (0.5 if too_long or too_short else 0.0)
         return ok, score, hyp, dur
@@ -124,7 +133,11 @@ class Checker:
 def load_model(device):
     from chatterbox.tts_turbo import ChatterboxTurboTTS
 
-    return ChatterboxTurboTTS.from_pretrained(device=device)
+    model = ChatterboxTurboTTS.from_pretrained(device=device)
+    # pyloudnorm hands back float64 audio, which the speech tokenizer rejects; keep it float32.
+    norm = model.norm_loudness
+    model.norm_loudness = lambda wav, sr, target_lufs=-27: np.asarray(norm(wav, sr, target_lufs), dtype=np.float32)
+    return model
 
 
 def use_voice(model, voice):

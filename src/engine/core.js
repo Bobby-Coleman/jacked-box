@@ -180,7 +180,7 @@ export function makeCtx(s, now, io) {
       const i = Math.floor(Math.random() * list.length);
       // Lines written for a name still work without one.
       const t = list[i].includes('{name}') ? lineSpoken(list[i]) : list[i];
-      pushCue(s, { k: key, i, t, at: now });
+      pushCue(s, { k: key, i, t: caption(t), at: now });
     },
     // A host line with a player's name spliced in ({name} at the start or end of the line).
     sayName(key, pid) {
@@ -192,7 +192,7 @@ export function makeCtx(s, now, io) {
       }
       const i = Math.floor(Math.random() * list.length);
       const nm = ctx.name(pid);
-      pushCue(s, { k: key, i, t: list[i].replace('{name}', nm), name: nm, at: now });
+      pushCue(s, { k: key, i, t: caption(list[i].replace('{name}', nm)), name: nm, at: now });
     },
     read(text) {
       if (!text) return;
@@ -243,6 +243,14 @@ export function makeCtx(s, now, io) {
     },
   };
   return ctx;
+}
+
+// Voice cues like [laugh] are for the renderer, not the captions.
+function caption(t) {
+  return String(t)
+    .replace(/\s*\[[a-z ]+\]\s*/g, ' ')
+    .replace(/\s+([,.!?])/g, '$1')
+    .trim();
 }
 
 function pushCue(s, cue) {

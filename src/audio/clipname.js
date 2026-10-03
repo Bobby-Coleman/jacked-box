@@ -21,6 +21,18 @@ export function nameClip(name) {
   return t ? 'n-' + t : null;
 }
 
+// Clips to try for a display name, best first: "Bobby C" -> bobbyc, bobby; "SAM2" -> sam2, sam.
+export function nameClips(name) {
+  const raw = String(name || '').normalize('NFKD');
+  const first = raw.trim().split(/[\s._-]+/)[0] || '';
+  const out = [];
+  for (const v of [raw, first, raw.replace(/\d+/g, ''), first.replace(/\d+/g, '')]) {
+    const c = nameClip(v);
+    if (c && !out.includes(c)) out.push(c);
+  }
+  return out;
+}
+
 // Host lines may splice a player's name in at the start or the end: "{name}, phone up!"
 // or "A masterpiece by {name}!". The line is rendered without the name; the name clip is
 // played before or after it.

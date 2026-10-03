@@ -10,7 +10,7 @@
     "preview": "vite preview --host",
     "sim": "node scripts/sim.mjs",
     "nettest": "node scripts/nettest.mjs",
-    "voice": "cd tools && npm install && node gen-voice.mjs",
+    "voice": "node tools/gen-voice.mjs all",
     "icons": "cd tools && npm install && node make-icons.mjs"
   },
   "dependencies": {

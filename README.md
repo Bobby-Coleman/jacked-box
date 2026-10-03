@@ -99,15 +99,17 @@ npx cap add ios          # needs a Mac with Xcode
 npx cap sync
 ```
 
-`capacitor.config.json` is already set up (`webDir: dist`). Inside the app, invite links and QR codes point at the public website (`PUBLIC_URL` in `src/platform.js`), so friends without the app can still join from a browser. Device features go through `src/platform.js` (haptics, keep-awake, share, storage), which is the one file to point at native plugins (`@capacitor/haptics`, `@capacitor-community/keep-awake`, `@capacitor/share`). Store icon: `public/icon-store-1024.png`.
+`capacitor.config.json` is already set up (`webDir: dist`). The face games use the front camera: the Android workflow adds the `CAMERA` permission automatically; for iOS, add `NSCameraUsageDescription` (e.g. "Take a selfie to star in face games") to `ios/App/App/Info.plist`. Without camera access, players can still pick a photo. Inside the app, invite links and QR codes point at the public website (`PUBLIC_URL` in `src/platform.js`), so friends without the app can still join from a browser. Device features go through `src/platform.js` (haptics, keep-awake, share, storage), which is the one file to point at native plugins (`@capacitor/haptics`, `@capacitor-community/keep-awake`, `@capacitor/share`). Store icon: `public/icon-store-1024.png`.
 
 ## Voice
 
-BOXTER's lines and every built-in prompt are pre-rendered with **Kokoro-82M** (Apache-2.0, by hexgrad) using `scripts/gen-voice.mjs`. Anything players type is read by the speaker phone's built-in voice. Only one phone (the "room speaker") plays narration and music, so the room hears one clean source.
+BOXTER, the host, is voiced by **Chatterbox-Turbo** (MIT license, by Resemble AI): every host line, every built-in prompt and ~600 common first names are pre-rendered on a GPU into small MP3s that ship with the site, so nothing runs at play time and it costs nothing. Names are separate clips spliced into lines like "BOBBY, phone on your forehead!". Every clip is checked with Whisper speech recognition and re-rolled if it doesn't match the script. Only text players type themselves (answers, crimes) is read by the speaker phone's own voice, picking the most natural one the phone has. Only one phone (the "room speaker") plays narration and music, so the room hears one clean source.
+
+To change lines or re-render: see [tools/tts/README.md](tools/tts/README.md) (`node tools/gen-voice.mjs all`).
 
 ## Credits
 
-- Voice: [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M), Apache-2.0.
+- Voice: [Chatterbox-Turbo](https://github.com/resemble-ai/chatterbox) by Resemble AI, MIT license (clips carry Resemble's imperceptible PerTh watermark). BOXTER's reference timbre was synthesized with [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) (Apache-2.0), so he doesn't sound like any real person. Clip QA: [Whisper](https://github.com/openai/whisper) (MIT).
 - Fonts: Big Shoulders Stencil Display, Lilita One, Bricolage Grotesque (SIL Open Font License), bundled via Fontsource.
 - QR codes: qrcode-generator by Kazuhiko Arase (MIT).
 - Music and sound effects are synthesized live in the browser with the Web Audio API.

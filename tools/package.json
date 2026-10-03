@@ -2,10 +2,12 @@
   "name": "jacked-box-tools",
   "private": true,
   "type": "module",
-  "description": "Offline asset tools: voice rendering (Kokoro TTS) and icon rendering. Not needed to run or build the game.",
+  "description": "Offline asset tools: voice rendering (Chatterbox-Turbo via tools/tts, MIT) and icon rendering. Not needed to run or build the game.",
   "scripts": {
-    "voice": "node gen-voice.mjs",
-    "voice:lines": "node gen-voice.mjs --lines",
+    "voice": "node gen-voice.mjs all",
+    "voice:jobs": "node gen-voice.mjs jobs",
+    "voice:encode": "node gen-voice.mjs encode",
+    "voice:refs": "node tts/make-refs.mjs",
     "icons": "node make-icons.mjs"
   },
   "dependencies": {

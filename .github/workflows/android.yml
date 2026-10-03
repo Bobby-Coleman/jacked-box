@@ -26,6 +26,9 @@ jobs:
         run: |
           npm install --no-save @capacitor/core@8 @capacitor/cli@8 @capacitor/android@8
           npx cap add android
+          # Live selfies (face games) use the camera through the WebView; it's optional hardware.
+          sed -i 's#<uses-permission android:name="android.permission.INTERNET" />#&<uses-permission android:name="android.permission.CAMERA" /><uses-feature android:name="android.hardware.camera" android:required="false" />#' android/app/src/main/AndroidManifest.xml
+          grep -n "CAMERA" android/app/src/main/AndroidManifest.xml
           mkdir -p assets && cp public/icon-store-1024.png assets/icon-only.png
           npx --yes @capacitor/assets@3 generate --android --iconBackgroundColor '#e23a2a' --splashBackgroundColor '#d9a466' || echo "icon generation skipped"
           npx cap sync android

@@ -111,7 +111,18 @@ export async function copyText(text) {
   }
 }
 
+// Public web address of the game. Invites must always point here, because inside a
+// native shell (Capacitor) the page's own origin is something like capacitor://localhost.
+export const PUBLIC_URL = 'https://bobby-coleman.github.io/jacked-box/';
+
+export function isNativeShell() {
+  const cap = typeof window !== 'undefined' && window.Capacitor;
+  if (cap && typeof cap.isNativePlatform === 'function') return cap.isNativePlatform();
+  return typeof location !== 'undefined' && !/^https?:$/.test(location.protocol);
+}
+
 export function appUrl() {
+  if (isNativeShell()) return PUBLIC_URL;
   const u = new URL(window.location.href);
   u.search = '';
   u.hash = '';

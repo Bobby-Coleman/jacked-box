@@ -11,6 +11,7 @@ import bomb from './bomb/logic.js';
 import noon from './noon/logic.js';
 import head from './head/logic.js';
 import seat from './seat/logic.js';
+import dead from './dead/logic.js';
 
-export const GAME_LIST = [zinger, fib, sketch, phone, blend, herd, seat, dial, bomb, noon, head];
+export const GAME_LIST = [zinger, fib, sketch, phone, dead, blend, herd, seat, dial, bomb, noon, head];
 export const GAMES = Object.fromEntries(GAME_LIST.map((g) => [g.id, g]));

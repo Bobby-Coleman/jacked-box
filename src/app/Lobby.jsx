@@ -12,6 +12,7 @@ const DEV = typeof location !== 'undefined' && new URLSearchParams(location.sear
 export function Lobby({ onShare, onEditMe }) {
   const st = useStore();
   const link = st.link;
+  if (!link || !link.state) return null;
   const s = link.state;
   const meId = link.me.id;
   const isVip = s.vip === meId;

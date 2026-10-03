@@ -12,8 +12,10 @@ Party games for a room full of phones. No TV, no console, no app to install: one
 | **Fib Factory** | Fibbage | 2–10 | Weird true facts with a blank. Write a lie that fools friends, then find the truth. Includes "about us" questions. |
 | **Sketchy** | Drawful | 3–8 | Draw a secret weird prompt on your phone. Everyone invents fake titles; find the real one. |
 | **Telephoney** | Gartic Phone | 3–10 | Write → draw → describe → draw… then replay every chain and watch the message fall apart. |
+| **Dead Lift** | Trivia Murder Party | 2–10 | Trivia in a haunted gym. Wrong answers send you to the Killing Floor mini-games; ghosts race to escape in the final. |
 | **Blend In** | The Chameleon | 3–12 | Everyone sees the secret word except the Chameleon. One-word clues out loud, then catch the faker. |
 | **Moojority** | Herd Mentality | 3–16 | Answer like everyone else to earn cows. The lone odd answer gets the Odd Cow. |
+| **Hot Seat** | Most Likely To | 3–16 | "Who's most likely to…?" Vote on your friends; score by agreeing with the room; everyone leaves with superlatives. |
 | **Mind Dial** | Wavelength | 2–12 | A psychic sees a hidden target on a spectrum and gives a clue; everyone turns their own dial. |
 | **Tick Tock Boom** | Catch Phrase / hot potato | 3–12 | Phones face up on the table. The bomb jumps between phones; shout an answer and tap to throw it. |
 | **High Noon** | Quick-draw duel | 2–16 | Phones on the table, hands off. When *your* screen says DRAW, slap it. Fake-outs punish twitchy fingers. |
@@ -24,7 +26,9 @@ Party games for a room full of phones. No TV, no console, no app to install: one
 - **Every game in one launcher**, with the VIP picking from a single shelf.
 - **Skippable rules** ("Got it, let's go") on every game.
 - **Family / Spicy toggle**, **timer speeds** (fast, normal, chill), **"questions about us"** toggle.
-- **Small groups work**: Fib Factory, Mind Dial, High Noon and Forehead play with 2.
+- **Small groups work**: Fib Factory, Dead Lift, Mind Dial, High Noon and Forehead play with 2.
+- **Games about the people in the room** (Hot Seat, "about us" questions in Fib Factory and Zinger Ring).
+- **Reactions**: throw emoji at answers during reveals; they float up on every phone.
 - **Drops don't wreck the night**: refresh or relock your phone and you're back in the same seat.
 
 ## How the netcode works

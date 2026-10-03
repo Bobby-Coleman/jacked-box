@@ -14,6 +14,7 @@ import { ZINGER_PROMPTS, ZINGER_FINALS } from '../src/content/zinger.js';
 import { FIB_FACTS } from '../src/content/fib.js';
 import { HERD_QUESTIONS } from '../src/content/herd.js';
 import { SEAT_PROMPTS } from '../src/content/seat.js';
+import { DEAD_TRIVIA, DEAD_TF } from '../src/content/dead.js';
 import { clipName } from '../src/audio/clipname.js';
 
 const VOICE = process.env.JB_VOICE || 'am_michael';
@@ -87,6 +88,8 @@ if (!args.has('--lines')) {
     jobs.push([clipName(spoken), spoken]);
   }
   for (const q of HERD_QUESTIONS) jobs.push([clipName(text(q)), text(q)]);
+  for (const q of DEAD_TRIVIA) jobs.push([clipName(q.q), q.q]);
+  for (const q of DEAD_TF) jobs.push([clipName(q.q), q.q]);
   for (const q of SEAT_PROMPTS) {
     const spoken = `Who is most likely to ${text(q)}?`;
     jobs.push([clipName(spoken), spoken]);

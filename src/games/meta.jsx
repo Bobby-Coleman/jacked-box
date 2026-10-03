@@ -71,6 +71,17 @@ const glyphs = {
       <circle cx="24" cy="21" r="4" fill="#fff" />
     </g>
   ),
+  dead: (a) => (
+    <g stroke={INK} stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M8 24h32" />
+      <rect x="4" y="15" width="8" height="18" rx="2" fill="#555" />
+      <rect x="36" y="15" width="8" height="18" rx="2" fill="#555" />
+      <path d="M17 20a7 7 0 0114 0v3l-2 2v3h-10v-3l-2-2z" fill={a} />
+      <circle cx="21.5" cy="21" r="1.8" fill={INK} stroke="none" />
+      <circle cx="26.5" cy="21" r="1.8" fill={INK} stroke="none" />
+      <path d="M22 28v-2M24 28v-2M26 28v-2" stroke-width="2" />
+    </g>
+  ),
   seat: (a) => (
     <g stroke={INK} stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
       <path d="M14 26h20v-14a3 3 0 00-3-3H17a3 3 0 00-3 3z" fill={a} />
@@ -100,6 +111,7 @@ export const GAME_META = {
   bomb: { id: 'bomb', name: 'Tick Tock Boom', bg: '#151515', fg: '#ff4040', accent: '#ff4040' },
   noon: { id: 'noon', name: 'High Noon', bg: '#f0a04b', fg: '#3b1d0e', accent: '#c4441c' },
   head: { id: 'head', name: 'Forehead', bg: '#ffde3b', fg: '#1d1611', accent: '#ff3d8b' },
+  dead: { id: 'dead', name: 'Dead Lift', bg: '#1f2b2a', fg: '#efe9dc', accent: '#9ff5d0' },
   seat: { id: 'seat', name: 'Hot Seat', bg: '#c4271c', fg: '#fff3e2', accent: '#ffd36b' },
 };
 

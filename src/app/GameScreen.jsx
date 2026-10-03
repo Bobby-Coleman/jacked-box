@@ -7,8 +7,10 @@ import { sfx } from '../audio/sfx.js';
 export function GameScreen() {
   const st = useStore();
   const link = st.link;
+  if (!link || !link.state) return null;
   const s = link.state;
   const g = s.game;
+  if (!g) return null;
   const meId = link.me.id;
   const m = GAME_META[g.id] || {};
   const View = VIEWS[g.id];

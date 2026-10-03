@@ -119,6 +119,23 @@ export const LINES = {
   'noon.early': ['Too early, partner.', 'Twitchy trigger finger!'],
   'noon.winner': ['Fastest hand in the west!', 'Now that is a quick draw.'],
 
+  // Dead Lift
+  'dead.intro': [
+    "Welcome to Dead Lift, the haunted gym where wrong answers are fatal. Get a question wrong and you go to the killing floor.",
+    'This is Dead Lift. Answer the trivia. Miss one, and you work out with the ghosts. Permanently.',
+  ],
+  'dead.floor': ['To the killing floor!', 'Wrong answer. Time for a workout you might not survive.', 'Oh no. Killing floor time.'],
+  'dead.lockers': ['Pick a locker. One of them is haunted.'],
+  'dead.math': ["Quick math! Get one wrong and you're done."],
+  'dead.memory': ['Memorize the reps. Then repeat them exactly.'],
+  'dead.taps': ['Tap as fast as you can when I say go. Do not stop!'],
+  'dead.died': ['Rest in reps.', "Ooh. That's a ghost now.", 'Welcome to the afterlife. The showers are cold.'],
+  'dead.survived': ['Everybody survived! For now.', 'You live to lift another day.'],
+  'dead.final': [
+    'Final round! Escape the gym. True or false. Every right answer moves you toward the exit. Ghosts start one step behind.',
+  ],
+  'dead.escape': ['We have a survivor! Someone made it out!', 'And they escape the gym! Barely.'],
+
   // Forehead
   'head.intro': [
     'Forehead! The guesser holds their phone on their forehead. Everyone else shouts clues. Tap got it or pass on your own phone.',

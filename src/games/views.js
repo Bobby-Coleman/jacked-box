@@ -10,6 +10,7 @@ import BombView from './bomb/View.jsx';
 import NoonView from './noon/View.jsx';
 import HeadView from './head/View.jsx';
 import SeatView from './seat/View.jsx';
+import DeadView from './dead/View.jsx';
 
 export const VIEWS = {
   zinger: ZingerView,
@@ -23,4 +24,5 @@ export const VIEWS = {
   noon: NoonView,
   head: HeadView,
   seat: SeatView,
+  dead: DeadView,
 };

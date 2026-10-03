@@ -7,6 +7,7 @@ import { sfx } from '../audio/sfx.js';
 export function Results() {
   const st = useStore();
   const link = st.link;
+  if (!link || !link.state) return null;
   const s = link.state;
   const r = s.results;
   const meId = link.me.id;

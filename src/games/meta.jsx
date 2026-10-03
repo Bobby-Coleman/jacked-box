@@ -98,6 +98,81 @@ const glyphs = {
       <path d="M17 9h14" stroke="#fff" />
     </g>
   ),
+  photo: (a) => (
+    <g stroke={INK} stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+      <rect x="5" y="8" width="38" height="32" rx="2" fill={a} />
+      <rect x="11" y="14" width="26" height="20" fill="#fff" />
+      <ellipse cx="20" cy="24" rx="5" ry="6" fill="#f3c9a0" />
+      <ellipse cx="30" cy="25" rx="4.5" ry="5.5" fill="#d9a07a" />
+      <path d="M15 33l5-4 4 3 5-5 8 6" fill="none" stroke-width="2.4" />
+    </g>
+  ),
+  zoom: (a) => (
+    <g stroke={INK} stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+      <circle cx="20" cy="20" r="13" fill="#0f2a24" />
+      <path d="M14 14h4v4h-4zM22 14h4v4h-4zM18 18h4v4h-4zM14 22h4v4h-4zM22 22h4v4h-4z" fill={a} stroke="none" />
+      <circle cx="20" cy="20" r="13" fill="none" />
+      <path d="M30 30l11 11" stroke-width="5" />
+    </g>
+  ),
+  frank: (a) => (
+    <g stroke={INK} stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M11 10h26v26a6 6 0 01-6 6H17a6 6 0 01-6-6z" fill={a} />
+      <path d="M11 10h26v7H11z" fill={INK} />
+      <path d="M6 28h5M37 28h5" stroke-width="4" />
+      <path d="M11 24h26" stroke-width="2" />
+      <path d="M16 22v4M22 22v4M28 22v4M34 22v4" stroke-width="1.8" />
+      <circle cx="18" cy="31" r="1.8" fill={INK} stroke="none" />
+      <circle cx="30" cy="31" r="1.8" fill={INK} stroke="none" />
+      <path d="M19 37h10" />
+    </g>
+  ),
+  wanted: (a) => (
+    <g stroke={INK} stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M9 5h30v38H9z" fill={a} />
+      <path d="M14 11h20" stroke-width="3.5" />
+      <rect x="16" y="16" width="16" height="15" fill="#c9a46a" />
+      <circle cx="24" cy="22" r="3.5" fill={INK} stroke="none" />
+      <path d="M18 31c1-4 3-5 6-5s5 1 6 5" fill={INK} stroke="none" />
+      <path d="M15 37h18" stroke-width="2.4" />
+    </g>
+  ),
+  pull: (a) => (
+    <g stroke={INK} stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M6 16a3 3 0 013-3h7l3-5h10l3 5h7a3 3 0 013 3v20a3 3 0 01-3 3H9a3 3 0 01-3-3z" fill={a} />
+      <circle cx="24" cy="26" r="9" fill="#fff" />
+      <circle cx="21" cy="24" r="1.4" fill={INK} stroke="none" />
+      <circle cx="27" cy="24" r="1.4" fill={INK} stroke="none" />
+      <ellipse cx="24" cy="29.5" rx="3" ry="2.2" fill={INK} stroke="none" />
+    </g>
+  ),
+  fraud: (a) => (
+    <g stroke={INK} stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M24 6C13 6 5 13 5 22c0 8 7 12 12 10 3-1 4 2 3 5-1 4 2 6 6 5 9-2 17-9 17-19S35 6 24 6z" fill={a} />
+      <circle cx="15" cy="18" r="3" fill="#ff3b3b" />
+      <circle cx="24" cy="13" r="3" fill="#2f7bff" />
+      <circle cx="33" cy="17" r="3" fill="#19b66a" />
+      <path d="M30 27q2-4 5-2t-1 5l-2 1v2" fill="none" stroke-width="2.6" />
+      <circle cx="32" cy="36" r="1.2" fill={INK} stroke="none" />
+    </g>
+  ),
+  pants: (a) => (
+    <g stroke={INK} stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M13 12h22l3 30h-9l-5-19-5 19h-9z" fill="#3d6cc9" />
+      <path d="M13 12h22v5H13z" fill="#2c4f96" />
+      <path d="M20 44c-5-3-4-8 0-12 0 3 2 4 3 4 0-3 0-5 3-8 1 4 5 7 3 12-1 3-4 5-9 4z" fill={a} />
+      <path d="M22 41c-1-2 0-4 2-5 0 1 1 2 2 2 1 2 0 3-1 4z" fill="#ffd400" stroke-width="1.5" />
+    </g>
+  ),
+  split: (a) => (
+    <g stroke={INK} stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M24 6a18 18 0 000 36z" fill={a} />
+      <path d="M24 6a18 18 0 010 36z" fill="#ff3d7f" />
+      <path d="M24 4v40" />
+      <path d="M12 24l3 3 5-6" stroke="#fff" stroke-width="2.6" fill="none" />
+      <path d="M29 20l7 8M36 20l-7 8" stroke="#fff" stroke-width="2.6" />
+    </g>
+  ),
 };
 
 export const GAME_META = {
@@ -113,6 +188,14 @@ export const GAME_META = {
   head: { id: 'head', name: 'Forehead', bg: '#ffde3b', fg: '#1d1611', accent: '#ff3d8b' },
   dead: { id: 'dead', name: 'Dead Lift', bg: '#1f2b2a', fg: '#efe9dc', accent: '#9ff5d0' },
   seat: { id: 'seat', name: 'Hot Seat', bg: '#c4271c', fg: '#fff3e2', accent: '#ffd36b' },
+  photo: { id: 'photo', name: 'Photobomb', bg: '#1e4d4a', fg: '#fff7e0', accent: '#e3b23c' },
+  zoom: { id: 'zoom', name: 'Zoom & Enhance', bg: '#0a1214', fg: '#c8ffe9', accent: '#2bffb0' },
+  frank: { id: 'frank', name: 'Frankenface', bg: '#16231d', fg: '#eaf7e0', accent: '#c9ff4a' },
+  wanted: { id: 'wanted', name: 'Most Wanted', bg: '#6b3f1d', fg: '#fbecd0', accent: '#ead2a2' },
+  pull: { id: 'pull', name: 'Pull a Face', bg: '#141414', fg: '#ffffff', accent: '#ffd400' },
+  fraud: { id: 'fraud', name: 'Art Fraud', bg: '#5b1220', fg: '#fff4e2', accent: '#d9a441' },
+  pants: { id: 'pants', name: 'Pants on Fire', bg: '#22201f', fg: '#fff1e6', accent: '#ff6a1f' },
+  split: { id: 'split', name: 'Split Decision', bg: '#181634', fg: '#f6f3ff', accent: '#12c2a9' },
 };
 
 export function GameGlyph({ id, size = 44 }) {

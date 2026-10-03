@@ -1,0 +1,215 @@
+/* MOST WANTED — Old West sheriff's office. Plank-wood wall, aged parchment posters, iron ink. */
+.theme-wanted {
+  --plank: #6b3f1d;
+  --plank-dk: #4a2a12;
+  --parch: #ead2a2;
+  --iron: #3b2412;
+  background-color: var(--plank);
+  background-image:
+    repeating-linear-gradient(0deg, var(--plank-dk) 0 3px, transparent 3px 64px),
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.08) 0 1px, transparent 1px 9px);
+  color: #fbecd0;
+}
+
+.theme-wanted .eyebrow {
+  color: rgba(251, 236, 208, 0.8);
+}
+
+.theme-wanted .label {
+  color: var(--ink);
+}
+
+.wt-poster {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: min(100%, 330px);
+  align-self: center;
+  padding: 16px 16px 18px;
+  background: var(--parch);
+  color: var(--iron);
+  border: 6px double var(--iron);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  transform: rotate(-1.2deg);
+  text-align: center;
+}
+
+.wt-poster::before,
+.wt-poster::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #8a8a8a;
+  box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.35);
+}
+
+.wt-poster::before {
+  left: 10px;
+}
+
+.wt-poster::after {
+  right: 10px;
+}
+
+.wt-wanted {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 3.4rem;
+  line-height: 0.9;
+  letter-spacing: 0.04em;
+}
+
+.wt-sub {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+}
+
+.wt-photo {
+  width: 70%;
+  aspect-ratio: 1 / 1;
+  border: 4px solid var(--iron);
+  margin: 6px 0;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: #d7bd8a;
+}
+
+.wt-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: sepia(0.75) contrast(1.1);
+}
+
+.wt-name {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 2rem;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.wt-crime {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.wt-bounty {
+  margin-top: 4px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.5rem;
+}
+
+.wt-stamp {
+  position: absolute;
+  top: 44%;
+  left: 50%;
+  padding: 2px 12px;
+  border: 5px solid #b3261e;
+  border-radius: 8px;
+  color: #b3261e;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 2.4rem;
+  transform: translate(-50%, -50%) rotate(-14deg);
+  background: rgba(234, 210, 162, 0.55);
+  animation: wtStamp 0.35s 0.4s cubic-bezier(0.2, 1.8, 0.4, 1) both;
+}
+
+.wt-charge {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 60px;
+  padding: 10px 12px;
+  border: 3px solid var(--iron);
+  border-radius: 10px;
+  background: var(--parch);
+  color: var(--iron);
+  box-shadow: 3px 3px 0 var(--plank-dk);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-style: italic;
+  font-size: 1.1rem;
+  text-align: left;
+  overflow-wrap: anywhere;
+  position: relative;
+}
+
+.wt-charge.on {
+  background: #ffe08a;
+}
+
+.wt-charge .badge {
+  position: absolute;
+  top: -10px;
+  right: 8px;
+}
+
+.wt-num {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--iron);
+  color: var(--parch);
+  font-family: var(--font-display);
+  font-style: normal;
+  font-weight: 900;
+}
+
+.wt-win {
+  background: #ffe08a;
+}
+
+@keyframes wtStamp {
+  from {
+    transform: translate(-50%, -50%) rotate(-8deg) scale(2.6);
+    opacity: 0;
+  }
+}
+
+/* While writing: a smaller poster keeps the text box in view above the keyboard. */
+.wt-poster.compact {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: 12px;
+  width: min(100%, 360px);
+  padding: 10px 12px;
+  transform: rotate(-0.8deg);
+}
+
+.wt-poster.compact .wt-wanted {
+  font-size: 2.2rem;
+  width: 100%;
+}
+
+.wt-poster.compact .wt-sub {
+  display: none;
+}
+
+.wt-poster.compact .wt-photo {
+  width: 96px;
+  margin: 2px 0;
+  border-width: 3px;
+}
+
+.wt-poster.compact .wt-name {
+  align-self: center;
+  font-size: 1.6rem;
+}

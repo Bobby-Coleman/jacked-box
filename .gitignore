@@ -9,3 +9,13 @@ scripts/voice-gen.log
 tools/node_modules/
 .claude/
 scripts/voice-gen*.log
+tools/tts/.venv/
+tools/tts/wav/
+tools/tts/*.log
+tools/tts/jobs.json
+tools/tts/.python/
+tools/tts/.uvcache/
+tools/tts/.hf/
+tools/tts/audition/
+tools/tts/refs/
+tools/tts/qa-report.json

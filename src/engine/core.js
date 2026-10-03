@@ -2,6 +2,7 @@
 // Game modules plug in through a small ctx API (phases, timers, scoring, voice cues).
 import { GAMES } from '../games/logic.js';
 import { LINES } from '../content/voice.js';
+import { lineSpoken } from '../audio/clipname.js';
 
 export const MAX_PLAYERS = 16;
 export const PLAYER_COLORS = [
@@ -106,6 +107,7 @@ function addPlayer(s, pid, info, now) {
 
 function removePlayer(s, pid, now, io) {
   if (!s.players[pid]) return;
+  if (s.players[pid].face && io) io.dropBlob(s.players[pid].face);
   const g = s.game;
   delete s.players[pid];
   s.order = s.order.filter((x) => x !== pid);
@@ -176,7 +178,21 @@ export function makeCtx(s, now, io) {
       const list = LINES[key];
       if (!list || !list.length) return;
       const i = Math.floor(Math.random() * list.length);
-      pushCue(s, { k: key, i, t: list[i], at: now });
+      // Lines written for a name still work without one.
+      const t = list[i].includes('{name}') ? lineSpoken(list[i]) : list[i];
+      pushCue(s, { k: key, i, t, at: now });
+    },
+    // A host line with a player's name spliced in ({name} at the start or end of the line).
+    sayName(key, pid) {
+      const list = LINES[key];
+      if (!list || !list.length) return;
+      if (!s.players[pid]) {
+        ctx.say(key);
+        return;
+      }
+      const i = Math.floor(Math.random() * list.length);
+      const nm = ctx.name(pid);
+      pushCue(s, { k: key, i, t: list[i].replace('{name}', nm), name: nm, at: now });
     },
     read(text) {
       if (!text) return;
@@ -264,7 +280,11 @@ function finishGame(s, g, now, extra) {
     if (place <= 3 && sc > 0) s.tally[pid] = (s.tally[pid] || 0) + (4 - place);
   });
   const ctx = makeCtx(s, now);
-  if (!extra.coop) ctx.say('results.winner');
+  if (!extra.coop) {
+    const [a, b] = ranking;
+    if (a && g.scores[a] > 0 && (!b || g.scores[a] !== g.scores[b])) ctx.sayName('results.winner', a);
+    else ctx.say('results.winner');
+  }
 }
 
 function startGame(s, id, now, io) {
@@ -272,6 +292,7 @@ function startGame(s, id, now, io) {
   if (!mod) return;
   const pids = s.order.filter((x) => s.players[x] && !s.players[x].screen && s.players[x].on !== false);
   if (pids.length < mod.min) return;
+  if (mod.faceMin && pids.slice(0, mod.max).filter((x) => s.players[x].face).length < mod.faceMin) return;
   for (const b of s.blobs || []) io && io.dropBlob(b);
   s.blobs = [];
   const players = pids.slice(0, mod.max);
@@ -376,6 +397,15 @@ export function reduce(s, pid, y, d, now, io) {
     case 'close':
       if (isVip) s.closed = true;
       break;
+    case 'face':
+      setFace(s, p, d.img, io);
+      break;
+    case 'botface': {
+      // Dev/test: the VIP gives a bot a face image.
+      const b = s.players[d.pid];
+      if (isVip && b && b.bot) setFace(s, b, d.img, io);
+      break;
+    }
     case 'addbot': {
       // Developer/test helper: the host phone plays for bot players.
       if (!isVip || s.scene !== 'lobby') break;
@@ -426,6 +456,23 @@ export function tick(s, now, io) {
     return;
   }
   mod.tick(ctx, g);
+}
+
+// A selfie: small JPEG data URL, stored as a blob (faces outlive games, unlike game blobs).
+function setFace(s, p, img, io) {
+  if (!io) return;
+  if (img === null || img === undefined) {
+    if (p.face) io.dropBlob(p.face);
+    delete p.face;
+    return;
+  }
+  if (typeof img !== 'string' || !/^data:image\/(jpeg|png|webp);base64,/.test(img) || img.length > 120000) return;
+  if (p.face) io.dropBlob(p.face);
+  p.face = io.blob({ img });
+}
+
+export function faceCount(s) {
+  return Object.values(s.players).filter((p) => p.face && !p.screen).length;
 }
 
 const BOT_NAMES = ['BEEPBOOP', 'ROBO-RITA', 'CHAD-GPT', 'SIRI-OUSLY', 'TOASTER', 'R2-DEUCE', 'BYTE-ME', 'CLANKY'];

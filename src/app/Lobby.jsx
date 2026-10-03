@@ -5,6 +5,8 @@ import { GAME_LIST } from '../games/logic.js';
 import { GAME_META, GameGlyph } from '../games/meta.jsx';
 import { sfx } from '../audio/sfx.js';
 import { appUrl, joinUrl } from '../platform.js';
+import { avatarJpeg } from '../ui/faces.jsx';
+import { myFace } from './session.js';
 
 // Hidden test mode: add ?dev=1 to the URL to get bot players in the lobby.
 const DEV = typeof location !== 'undefined' && new URLSearchParams(location.search).has('dev');
@@ -80,6 +82,8 @@ export function Lobby({ onShare, onEditMe }) {
         </div>
       </section>
 
+      <FacePrompt s={s} meId={meId} players={players} onEditMe={onEditMe} />
+
       {s.played > 0 && <PartyStandings s={s} meId={meId} />}
 
       {isVip && DEV && (
@@ -87,6 +91,19 @@ export function Lobby({ onShare, onEditMe }) {
           <button class="btn sm" onClick={() => send('addbot', {})}>
             + Add test bot
           </button>
+          {players.some((p) => p.bot && !p.face) && (
+            <button
+              class="btn sm"
+              onClick={async () => {
+                for (const p of players.filter((x) => x.bot && !x.face)) {
+                  const img = await avatarJpeg(p.av, p.color);
+                  send('botface', { pid: p.id, img });
+                }
+              }}
+            >
+              Give bots faces
+            </button>
+          )}
           {players.some((p) => p.bot) && (
             <button class="btn sm ghost" onClick={() => send('dropbots', {})}>
               Remove bots
@@ -106,6 +123,34 @@ export function Lobby({ onShare, onEditMe }) {
         </section>
       )}
     </div>
+  );
+}
+
+// Nudge players to add a selfie: several games star the faces in the room.
+function FacePrompt({ s, meId, players, onEditMe }) {
+  const me = s.players[meId];
+  const withFaces = players.filter((p) => p.face).length;
+  if (!me || me.screen) return null;
+  if (me.face || myFace()) {
+    if (players.length < 2) return null;
+    return (
+      <p class="small center-text" style={{ margin: 0, fontWeight: 700 }}>
+        {withFaces} of {players.length} players added their face{withFaces < players.length ? '. Nudge the others!' : '. Face games are a go.'}
+      </p>
+    );
+  }
+  return (
+    <section class="label tight face-card pop-in" aria-label="Add your face">
+      <div class="col" style={{ gap: 2, flex: 1, minWidth: 0 }}>
+        <strong>Put your face in the box</strong>
+        <span class="small muted">
+          {withFaces > 0 ? `${withFaces} of ${players.length} players already did. ` : ''}Face games put your friends' faces into drawings, wanted posters and mash-ups.
+        </span>
+      </div>
+      <button class="btn sm primary" onClick={onEditMe}>
+        Add selfie
+      </button>
+    </section>
   );
 }
 
@@ -182,10 +227,17 @@ function ScreenLobby({ s, players, host }) {
 }
 
 const SHELVES = [
-  { title: 'Write, draw & bluff', ids: ['zinger', 'fib', 'sketch', 'phone', 'dead'] },
-  { title: 'Talk it out', ids: ['blend', 'herd', 'seat', 'dial'] },
+  { title: 'Starring your faces', sub: 'Tap your avatar to add a selfie. No selfie? Your box stands in.', ids: ['photo', 'wanted', 'pull', 'zoom', 'frank'] },
+  { title: 'Write, draw & bluff', ids: ['zinger', 'fib', 'sketch', 'phone', 'dead', 'split'] },
+  { title: 'Talk it out', ids: ['blend', 'fraud', 'pants', 'herd', 'seat', 'dial'] },
   { title: 'Phones on the table', ids: ['bomb', 'noon', 'head'] },
 ];
+
+function startLabel(mod, active, faces) {
+  if (active < mod.min) return `Need ${mod.min - active} more ${mod.min - active === 1 ? 'player' : 'players'}`;
+  if (mod.faceMin && faces < mod.faceMin) return `Need ${mod.faceMin - faces} more ${mod.faceMin - faces === 1 ? 'selfie' : 'selfies'}`;
+  return `Start ${mod.name}`;
+}
 
 function GamePicker({ s, active }) {
   const pick = s.pick;
@@ -193,12 +245,18 @@ function GamePicker({ s, active }) {
   const listed = new Set(SHELVES.flatMap((sh) => sh.ids));
   const extra = GAME_LIST.filter((g) => !listed.has(g.id)).map((g) => g.id);
   const shelves = extra.length ? SHELVES.concat([{ title: 'More', ids: extra }]) : SHELVES;
+  const faces = Object.values(s.players).filter((p) => !p.screen && p.on !== false && p.face).length;
   return (
     <section class="col" aria-label="Pick a game">
       <span class="eyebrow">You're the VIP. Pick a game.</span>
       {shelves.map((sh) => (
         <div class="col" key={sh.title} style={{ gap: 10 }}>
           <h2 class="shelf-title stencil">{sh.title}</h2>
+          {sh.sub && (
+            <p class="small" style={{ margin: '-6px 0 0', fontWeight: 700 }}>
+              {sh.sub}
+            </p>
+          )}
           <div class="game-list">
             {sh.ids
               .map((id) => byId[id])
@@ -217,13 +275,13 @@ function GamePicker({ s, active }) {
                   {pick === mod.id && (
                     <button
                       class="btn primary slide-in"
-                      disabled={active < mod.min}
+                      disabled={active < mod.min || (mod.faceMin && faces < mod.faceMin)}
                       onClick={() => {
                         sfx('bell');
                         send('start', { id: mod.id });
                       }}
                     >
-                      {active < mod.min ? `Need ${mod.min - active} more ${mod.min - active === 1 ? 'player' : 'players'}` : `Start ${mod.name}`}
+                      {startLabel(mod, active, faces)}
                     </button>
                   )}
                 </div>
@@ -258,6 +316,7 @@ export function GameCard({ id, active, selected, onClick }) {
         <span class="gc-meta">
           {mod.min}–{mod.max} players · ~{mod.minutes} min
           {mod.tags && mod.tags.length ? ' · ' + mod.tags.join(' · ') : ''}
+          {mod.faceMin ? ` · needs ${mod.faceMin} selfies` : ''}
         </span>
       </span>
     </Tag>

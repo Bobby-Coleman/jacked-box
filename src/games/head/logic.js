@@ -24,8 +24,7 @@ function nextTurn(ctx, g) {
   const words = ctx.shuffle(all[cat]).slice(0, 30);
   g.t = { guesser, cat, words, i: 0, got: [], passed: [], last: 0 };
   ctx.phase(g, 'ready', 15000);
-  ctx.say('head.next');
-  ctx.read(`${ctx.name(guesser)}, phone on your forehead!`);
+  ctx.sayName('head.next', guesser);
 }
 
 function advance(ctx, g, ok) {

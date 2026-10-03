@@ -5,6 +5,7 @@ import { engine } from '../src/engine/core.js';
 import { GAMES, GAME_LIST } from '../src/games/logic.js';
 
 const only = process.argv[2];
+const FACE = 'data:image/jpeg;base64,' + 'A'.repeat(400);
 const runs = Number(process.argv[3] || 6);
 
 function simulate(gameId, n, opts = {}) {
@@ -23,6 +24,14 @@ function simulate(gameId, n, opts = {}) {
   const ids = Array.from({ length: n }, (_, i) => 'p' + i);
   const s = engine.createRoom({ code: 'TEST', me: { id: ids[0], name: 'Pat', av: {} }, settings: opts.settings || {}, now });
   for (const id of ids.slice(1)) engine.reduce(s, id, 'join', { name: 'Bot' + id }, now, io);
+  // Face games: everyone has a selfie when the game needs them; otherwise a random few do.
+  const faceN = mod.faceMin ? n : mod.faces ? Math.floor(Math.random() * (n + 1)) : 0;
+  if (mod.faceMin && n > 1) {
+    // Too few faces: the engine must refuse to start.
+    engine.reduce(s, ids[0], 'start', { id: gameId }, now, io);
+    if (s.scene === 'game') throw new Error(`${gameId} started without enough faces`);
+  }
+  for (const id of ids.slice(0, faceN)) engine.reduce(s, id, 'face', { img: FACE }, now, io);
   engine.reduce(s, ids[0], 'start', { id: gameId }, now, io);
   if (s.scene !== 'game') throw new Error(`${gameId} did not start with ${n} players`);
   let ticks = 0;

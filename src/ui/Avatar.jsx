@@ -1,6 +1,11 @@
 // Procedural "box buddy" avatars: every player is a little cardboard box with a face.
 // Parts: b = box style (0-7), e = eyes (0-11), m = mouth (0-11), h = headwear (0-13).
+// If the player added a selfie, their real face peeks out of the front of the box.
+import { useRef } from 'preact/hooks';
+import { faceSrc } from './faceRegistry.js';
+
 const INK = '#1d1611';
+let clipSeq = 0;
 
 export const AV_PARTS = { b: 8, e: 12, m: 12, h: 14 };
 
@@ -345,27 +350,48 @@ function BoxBody({ b, color }) {
   );
 }
 
-export function AvatarSvg({ av, color = '#d9a466', size = 64, title }) {
+export function AvatarSvg({ av, color = '#d9a466', size = 64, title, face }) {
   const a = av || { b: 0, e: 0, m: 0, h: 0 };
   const { x0, x1, y0, y1, d } = geom(a.b);
   const w = x1 - x0;
   const cx = (x0 + x1) / 2;
   const hgt = y1 - y0;
+  const clip = useRef(null);
+  if (face && !clip.current) clip.current = 'avc' + ++clipSeq;
+  // The face window is a little inset from the box edge, like a cut-out flap.
+  const fx = x0 + 4;
+  const fy = y0 + 4;
+  const fw = w - 8;
+  const fh = hgt - 8;
   return (
     <span class="avatar" style={{ width: size, height: size }} role="img" aria-label={title || 'avatar'}>
       <svg viewBox="-4 -16 108 116" aria-hidden="true">
         <BoxBody b={a.b} color={color} />
-        <Eyes e={a.e} cx={cx} y={y0 + hgt * 0.36} w={w} />
-        <Mouth m={a.m} cx={cx} y={y0 + hgt * 0.68} />
+        {face ? (
+          <g>
+            <defs>
+              <clipPath id={clip.current}>
+                <rect x={fx} y={fy} width={fw} height={fh} rx="6" />
+              </clipPath>
+            </defs>
+            <image href={face} x={fx - fw * 0.08} y={fy - fh * 0.06} width={fw * 1.16} height={fh * 1.16} preserveAspectRatio="xMidYMid slice" clip-path={`url(#${clip.current})`} />
+            <rect x={fx} y={fy} width={fw} height={fh} rx="6" fill="none" stroke={INK} stroke-width="2.6" />
+          </g>
+        ) : (
+          <>
+            <Eyes e={a.e} cx={cx} y={y0 + hgt * 0.36} w={w} />
+            <Mouth m={a.m} cx={cx} y={y0 + hgt * 0.68} />
+          </>
+        )}
         <Hat h={a.h} x={cx + d / 2} y={y0 - d / 2} w={w} />
       </svg>
     </span>
   );
 }
 
-export function PlayerAvatar({ p, size = 56 }) {
+export function PlayerAvatar({ p, size = 56, noFace = false }) {
   if (!p) return <AvatarSvg av={{ b: 0, e: 3, m: 2, h: 0 }} color="#9c8a74" size={size} />;
-  return <AvatarSvg av={p.av} color={p.color} size={size} title={p.name} />;
+  return <AvatarSvg av={p.av} color={p.color} size={size} title={p.name} face={noFace ? null : faceSrc(p)} />;
 }
 
 // BOXTER — the host. A swole cardboard box with a sweatband.

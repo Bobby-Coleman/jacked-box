@@ -1,0 +1,91 @@
+/* FRANKENFACE — a mad lab. Bubbling green-black, lightning-white highlights, steel gurney. */
+.theme-frank {
+  --lab: #16231d;
+  --volt: #c9ff4a;
+  --steel: #9fb3ad;
+  background-color: var(--lab);
+  background-image:
+    radial-gradient(50% 35% at 80% 10%, rgba(201, 255, 74, 0.12), transparent 70%),
+    radial-gradient(40% 30% at 10% 90%, rgba(201, 255, 74, 0.08), transparent 70%);
+  color: #eaf7e0;
+}
+
+.theme-frank .eyebrow {
+  color: rgba(234, 247, 224, 0.72);
+}
+
+.theme-frank .label {
+  color: var(--ink);
+}
+
+.fk-slab {
+  position: relative;
+  width: min(100%, 380px);
+  aspect-ratio: 1 / 1;
+  align-self: center;
+  border: 6px solid var(--steel);
+  border-radius: 50% 50% 46% 46% / 42% 42% 58% 58%;
+  overflow: hidden;
+  box-shadow: 0 0 0 3px var(--ink), 0 0 26px rgba(201, 255, 74, 0.28);
+  background: #000;
+}
+
+.fk-slab canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.fk-part {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fk-row {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
+}
+
+.fk-chip {
+  appearance: none;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px 5px 5px;
+  border: 2px solid var(--steel);
+  border-radius: 99px;
+  background: #22332b;
+  color: #eaf7e0;
+  font-family: var(--font-game);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.fk-chip.on {
+  background: var(--volt);
+  color: var(--ink);
+  border-color: var(--ink);
+}
+
+.fk-donors {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.fk-donor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 10px;
+  border: 2px dashed var(--volt);
+  border-radius: 12px;
+  min-width: 90px;
+}

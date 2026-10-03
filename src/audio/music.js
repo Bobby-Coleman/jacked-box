@@ -110,6 +110,70 @@ const TRACKS = {
     keys: '..x...x...x...x.', keysType: 'square', keysVol: 0.035,
     arp: null,
   },
+  photo: {
+    bpm: 96, swing: 0.2,
+    chords: [[53, 57, 60, 64], [50, 53, 57, 60], [55, 59, 62, 65], [48, 52, 55, 59]],
+    bass: '1.3.5.6.8.6.5.3.', bassType: 'triangle', bassVol: 0.5,
+    drums: { k: 'x.......x.......', h: 'x..x..x.x..x..x.' },
+    keys: 'x.....x.....x...', keysType: 'triangle', keysVol: 0.06,
+    arp: { pat: [0, 2, 3, 2], every: 4, oct: 12, type: 'pluck', vol: 0.07, gate: 'x...x.x.....x...' },
+  },
+  zoom: {
+    bpm: 110, swing: 0,
+    chords: [[45, 48, 52], [41, 45, 48], [43, 47, 50], [40, 44, 47]],
+    bass: '1.1.1.1.1.1.1.1.', bassType: 'sawtooth', bassVol: 0.3,
+    drums: { k: 'x...x...x...x...', h: '..x...x...x...x.' },
+    keys: null,
+    arp: { pat: [0, 1, 2, 1], every: 1, oct: 12, type: 'square', vol: 0.025, gate: 'x.x.x.x.x.x.x.x.', delay: true },
+  },
+  frank: {
+    bpm: 90, swing: 0,
+    chords: [[45, 48, 51], [44, 47, 50], [45, 48, 52], [46, 49, 53]],
+    bass: '1.....1.1.....5.', bassType: 'sawtooth', bassVol: 0.3,
+    drums: { k: 'x.......x..x....', t: '......x.......x.' },
+    keys: 'x...............', keysType: 'triangle', keysVol: 0.05, keysLen: 14,
+    arp: { pat: [2, 1, 0, 1], every: 2, oct: 12, type: 'sine', vol: 0.05, gate: 'x..x..x.x..x..x.', delay: true },
+  },
+  wanted: {
+    bpm: 96, swing: 0.18,
+    chords: [[52, 55, 59], [57, 60, 64], [52, 55, 59], [47, 51, 54]],
+    bass: '1...5...1...5.5.', bassType: 'triangle', bassVol: 0.55,
+    drums: { k: 'x.....x.x.......', sh: 'x.xxx.xxx.xxx.xx' },
+    keys: null,
+    arp: { pat: [0, 1, 2, 1], every: 4, oct: 12, type: 'whistle', vol: 0.05, gate: 'x.......x...x...', delay: true },
+  },
+  pull: {
+    bpm: 120, swing: 0,
+    chords: [[57, 60, 64], [50, 53, 57], [55, 59, 62], [52, 55, 59]],
+    bass: '1.8.1.8.1.8.1.8.', bassType: 'triangle', bassVol: 0.5,
+    drums: { k: 'x...x...x...x...', s: '....x.......x...', h: '..x...x...x...x.' },
+    keys: 'x.x...x.x...x...', keysType: 'square', keysVol: 0.035,
+    arp: null,
+  },
+  fraud: {
+    bpm: 104, swing: 0.1,
+    chords: [[50, 53, 57], [52, 55, 58], [53, 57, 60], [52, 55, 59]],
+    bass: '1...5...1...5...', bassType: 'triangle', bassVol: 0.5,
+    drums: { k: 'x.......x.......', h: '..x...x...x...x.' },
+    keys: null,
+    arp: { pat: [0, 1, 2, 1], every: 2, oct: 12, type: 'pluck', vol: 0.09, gate: 'x.x...x.x...x.x.' },
+  },
+  pants: {
+    bpm: 100, swing: 0,
+    chords: [[50, 53, 57], [50, 53, 58], [50, 53, 57], [49, 52, 56]],
+    bass: '1.1.....1.1.....', bassType: 'triangle', bassVol: 0.5,
+    drums: { k: 'x.......x.......', t: '....x.......x...', h: 'x.x.x.x.x.x.x.x.' },
+    keys: null,
+    arp: { pat: [0, 2, 1, 2], every: 2, oct: 12, type: 'marimba', vol: 0.08, gate: 'x..x..x...x..x..' },
+  },
+  split: {
+    bpm: 128, swing: 0,
+    chords: [[60, 64, 67], [57, 60, 64], [62, 65, 69], [55, 59, 62]],
+    bass: '1.1.5.5.1.1.5.5.', bassType: 'square', bassVol: 0.28,
+    drums: { k: 'x...x...x...x...', s: '....x.......x...', h: 'x.x.x.x.x.x.x.x.', c: '............x...' },
+    keys: null,
+    arp: { pat: [0, 1, 2, 1], every: 2, oct: 12, type: 'square', vol: 0.03, gate: 'x.x.x.x.x.x.x.x.' },
+  },
   results: {
     bpm: 108, swing: 0.05,
     chords: [[60, 64, 67], [53, 57, 60], [55, 59, 62], [60, 64, 67]],
@@ -254,7 +318,7 @@ function schedule() {
     const bc = tr.bass && tr.bass[s];
     if (bc && bc !== '.') {
       const root = chord[0] - 12;
-      const n = bc === '5' ? root + 7 : bc === '8' ? root + 12 : bc === '7' ? root + 10 : root;
+      const n = bc === '5' ? root + 7 : bc === '8' ? root + 12 : bc === '7' ? root + 10 : bc === '3' ? chord[1] - 12 : bc === '6' ? root + 9 : root;
       voice(ac, dest, { type: tr.bassType, freq: mtof(n), t, a: 0.006, d: sixteenth * 1.8, vol: tr.bassVol * 0.5, lp: 700 });
     }
     if (tr.keys && tr.keys[s] === 'x') {

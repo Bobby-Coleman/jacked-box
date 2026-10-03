@@ -38,7 +38,7 @@ function startClues(ctx, g) {
   g.r.ready = {};
   ctx.phase(g, 'clues', 11000);
   ctx.say('blend.clues');
-  ctx.read(`${ctx.name(g.r.order[0])} goes first.`);
+  ctx.sayName('blend.first', g.r.order[0]);
 }
 
 function advanceTurn(ctx, g) {
@@ -52,7 +52,7 @@ function advanceTurn(ctx, g) {
     ctx.say('blend.discuss');
   } else {
     ctx.phase(g, 'clues', 11000);
-    ctx.read(ctx.name(r.order[r.turn]));
+    ctx.sayName('blend.turn', r.order[r.turn]);
   }
 }
 

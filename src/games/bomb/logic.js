@@ -49,7 +49,7 @@ function explode(ctx, g) {
   g.lives[r.holder] = Math.max(0, (g.lives[r.holder] || 0) - 1);
   for (const p of g.pids) g.scores[p] = (g.lives[p] || 0) * 1000 + (g.passes[p] || 0) * 10;
   ctx.beat(g, 'boom', 6000);
-  ctx.say('bomb.boom');
+  ctx.sayName('bomb.boom', r.holder);
 }
 
 export default {

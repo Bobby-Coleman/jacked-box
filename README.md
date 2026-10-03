@@ -6,6 +6,19 @@ Party games for a room full of phones. No TV, no console, no app to install: one
 
 ## The games
 
+### Starring your faces
+Everyone can add a selfie (tap your avatar). Your face goes into the box avatar and stars in these games. No selfie? Your box stands in.
+
+| Game | Players | What happens |
+| --- | --- | --- |
+| **Photobomb** | 3–10 | You get a scene starring two friends ("Sam and Riley robbing a bank"). Their selfies are stickers on your canvas: drag, resize, rotate, then draw the rest. Gallery tour, then vote. Save your favorite as an image. |
+| **Most Wanted** | 3–10 | Every player's face goes on a WANTED poster. Two friends each write the crime; the room votes which charge sticks. Biggest bounty is Public Enemy #1. Save the poster. |
+| **Pull a Face** | 3–10 | Everyone gets the same prompt ("You just stepped on a Lego") and snaps a selfie acting it out. Vote for the best face. Final round is COPYCAT: recreate a friend's face from earlier, side by side. |
+| **Zoom & Enhance** | 3–12 | A friend's face, extremely zoomed, pixelated, blurred or scrambled, slowly enhancing. Buzz in first with whose face it is. Needs 3 selfies. |
+| **Frankenface** | 3–12 | Faces sliced and stitched into a monster. Name the donor of each part, fast. Needs 3 selfies. |
+
+### Everything else
+
 | Game | Inspired by | Players | What happens |
 | --- | --- | --- | --- |
 | **Zinger Ring** | Quiplash | 3–10 | Write funny answers. Answers fight head-to-head; the room votes. Final round puts everyone in the ring. |
@@ -20,6 +33,9 @@ Party games for a room full of phones. No TV, no console, no app to install: one
 | **Tick Tock Boom** | Catch Phrase / hot potato | 3–12 | Phones face up on the table. The bomb jumps between phones; shout an answer and tap to throw it. |
 | **High Noon** | Quick-draw duel | 2–16 | Phones on the table, hands off. When *your* screen says DRAW, slap it. Fake-outs punish twitchy fingers. |
 | **Forehead** | Heads Up | 2–12 | Phone on your forehead, screen out. Friends see the word on their own phones, shout clues, and tap GOT IT. |
+| **Art Fraud** | A Fake Artist Goes to New York | 4–10 | One shared canvas, one stroke each in your own color. Everyone knows the word except the Fraud. Vote them out; if caught, they can still steal it by guessing the word. |
+| **Pants on Fire** | Two Truths and a Lie | 3–10 | Write two truths and a lie about yourself. Each player takes the hot seat (face on fire) while the room grills them out loud, then votes on the lie. |
+| **Split Decision** | Would You Rather | 3–12 | Finish a deal like "You can fly, but ____" so the room splits exactly 50/50 on DEAL or NO DEAL. Unanimous scores zero. |
 
 ### Things players asked Jackbox for, built in
 - **No TV needed.** Everything renders on the phones, so no casting and no stream delay.
@@ -27,9 +43,18 @@ Party games for a room full of phones. No TV, no console, no app to install: one
 - **Skippable rules** ("Got it, let's go") on every game.
 - **Family / Spicy toggle**, **timer speeds** (fast, normal, chill), **"questions about us"** toggle.
 - **Small groups work**: Fib Factory, Dead Lift, Mind Dial, High Noon and Forehead play with 2.
+- **Your friends' actual faces** in drawings, wanted posters, mash-ups and guessing games.
+- **Save and share the funniest moments**: Photobomb art, wanted posters, Art Fraud canvases and Pull a Face contact sheets save as images.
 - **Games about the people in the room** (Hot Seat, "about us" questions in Fib Factory and Zinger Ring).
 - **Reactions**: throw emoji at answers during reveals; they float up on every phone.
 - **Drops don't wreck the night**: refresh or relock your phone and you're back in the same seat.
+
+## Faces and privacy
+
+- Selfies are optional and stay on your phone until you join a room. They're 240×240 JPEGs (about 15 KB).
+- In a room, your face travels through the same end-to-end encrypted channel as everything else. Only people with the room code can see it.
+- Leaving the room removes your face from it. You can retake or remove your selfie at any time from your avatar.
+- Pull a Face snaps are only used for that game and are dropped when the next game starts.
 
 ## How the netcode works
 
@@ -40,7 +65,8 @@ Party games for a room full of phones. No TV, no console, no app to install: one
 ```
 
 - **Host-authoritative.** One phone runs the game engine (`src/engine`, `src/games/*/logic.js`); everyone else sends inputs and renders the host's state.
-- **Two relays at once.** Every message goes through two free public MQTT-over-WebSocket brokers, de-duplicated on arrival, so one broker going down is invisible. A third broker kicks in as a fallback.
+- **Several relays at once.** Every message goes through three free public MQTT-over-WebSocket brokers (EMQX, HiveMQ, shiftr.io), de-duplicated on arrival, so a broker going down is invisible. A fourth kicks in as a fallback.
+- **Private rooms.** The room code never goes over the wire: it's stretched (PBKDF2) into an AES-GCM key and an unguessable channel name, and every message is encrypted end to end. The public brokers only ever see ciphertext.
 - **Reliable inputs.** Inputs carry sequence numbers, are resent until the host's snapshot acknowledges them, and are applied strictly in order.
 - **Retained snapshots.** The latest state is retained on the brokers, so a phone that reloads or wakes up gets it immediately.
 - **Host migration.** If the host's phone goes quiet (locked, app switched, dead battery), the next connected phone takes over from the last snapshot within ~7 seconds. Higher term wins; equal terms resolve deterministically.

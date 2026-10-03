@@ -18,6 +18,15 @@ export class PubSub {
     this.fallbackAdded = false;
     this.started = false;
     this.lowSince = 0;
+    this.codec = null;
+    this.outChain = Promise.resolve();
+    this.inChain = Promise.resolve();
+  }
+
+  // Optional {seal(obj) -> Promise<bytes>, open(bytes) -> Promise<obj>} for end-to-end sealing.
+  // Sealing is async, so sends and receives run through promise chains to keep their order.
+  setCodec(codec) {
+    this.codec = codec;
   }
 
   start() {
@@ -92,15 +101,25 @@ export class PubSub {
   }
 
   publish(topic, obj, retain = false) {
-    let payload = '';
-    if (obj != null) {
-      if (!obj._i) obj._i = randomId(10);
-      this._mark(obj._i);
-      payload = JSON.stringify(obj);
+    if (obj == null) {
+      // Empty retained payload clears a retained message on the brokers.
+      for (const c of this.clients) c.publish(topic, '', retain);
+      return;
     }
-    let ok = false;
-    for (const c of this.clients) if (c.publish(topic, payload, retain)) ok = true;
-    return ok;
+    if (!obj._i) obj._i = randomId(10);
+    this._mark(obj._i);
+    if (!this.codec) {
+      const payload = JSON.stringify(obj);
+      for (const c of this.clients) c.publish(topic, payload, retain);
+      return;
+    }
+    const codec = this.codec;
+    this.outChain = this.outChain
+      .then(() => codec.seal(obj))
+      .then((bytes) => {
+        for (const c of this.clients) c.publish(topic, bytes, retain);
+      })
+      .catch(() => {});
   }
 
   _mark(id) {
@@ -116,18 +135,37 @@ export class PubSub {
 
   _in(topic, payload, retain) {
     if (!payload || !payload.length) return;
+    if (this.codec) {
+      const codec = this.codec;
+      const bytes = payload.slice();
+      this.inChain = this.inChain
+        .then(() => codec.open(bytes))
+        .then(
+          (obj) => this._deliver(topic, obj, retain),
+          () => {},
+        );
+      return;
+    }
     let obj;
     try {
       obj = JSON.parse(decodeText(payload));
     } catch (e) {
       return;
     }
+    this._deliver(topic, obj, retain);
+  }
+
+  _deliver(topic, obj, retain) {
     if (!obj || typeof obj !== 'object') return;
     if (obj._i) {
       if (this.seen.has(obj._i)) return;
       this._mark(obj._i);
     }
-    this.onMessage(topic, obj, retain);
+    try {
+      this.onMessage(topic, obj, retain);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   kick() {

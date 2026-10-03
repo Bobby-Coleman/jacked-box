@@ -13,8 +13,9 @@
 //  - large payloads (drawings) ride inside inputs, then the host republishes them
 //    as retained blobs that late joiners receive automatically
 import { PubSub } from './pubsub.js';
+import { roomKeys, makeCodec } from './seal.js';
 
-export const NS = 'jackedbox/r1';
+export const NS = 'jackedbox/r2';
 const HOST_TIMEOUT = 6500;
 const HB_MS = 2000;
 const PING_MS = 2500;
@@ -30,7 +31,7 @@ export class RoomLink {
     this.code = code;
     this.me = me;
     this.engine = engine;
-    this.base = `${NS}/${code}`;
+    this.base = null; // set once the room keys are derived (topic never contains the code)
     this.state = null;
     this.isHost = false;
     this.listeners = new Set();
@@ -167,6 +168,7 @@ export class RoomLink {
 
   // Call when the page becomes visible again (phones suspend tabs aggressively).
   wake() {
+    if (!this.base) return;
     this.hostSeenAt = Date.now();
     this.ps.kick();
     if (!this.isHost) this.ps.resubscribe(`${this.base}/s`);
@@ -176,6 +178,11 @@ export class RoomLink {
   // ---------- internals ----------
 
   async _open() {
+    if (!this.base) {
+      const keys = await roomKeys(this.code);
+      this.base = `${NS}/${keys.topic}`;
+      if (this.ps.setCodec && !globalThis.JB_NOSEAL) this.ps.setCodec(makeCodec(keys.key));
+    }
     this.ps.start();
     this.ps.subscribe(`${this.base}/s`);
     this.ps.subscribe(`${this.base}/h`);
@@ -197,7 +204,7 @@ export class RoomLink {
   }
 
   _msg(topic, m) {
-    if (this.closed) return;
+    if (this.closed || !this.base || !topic.startsWith(this.base)) return;
     const kind = topic.slice(this.base.length + 1);
     if (kind === 's') this._onState(m.s, m.t);
     else if (kind === 'h') this._onHeartbeat(m);
@@ -264,7 +271,7 @@ export class RoomLink {
   }
 
   _flushOutbox(now, force = false) {
-    if (this.isHost) return;
+    if (this.isHost || !this.base) return;
     for (const o of this.outbox) {
       if (!force && o.at && now - o.at < RESEND_MS) continue;
       this.ps.publish(`${this.base}/i`, o.env);

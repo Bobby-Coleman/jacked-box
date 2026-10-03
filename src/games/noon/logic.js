@@ -45,7 +45,7 @@ function results(ctx, g) {
     }
   }
   if (Object.values(r.taps).some((t) => t.early || t.fake)) ctx.say('noon.early');
-  else if (valid.length) ctx.say('noon.winner');
+  else if (valid.length) ctx.sayName('noon.winner', valid[0][0]);
   ctx.beat(g, 'result', 6000);
 }
 

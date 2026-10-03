@@ -1,0 +1,110 @@
+/* ZOOM & ENHANCE — a crime-lab monitor. Blacked-out room, phosphor green readouts, evidence tags. */
+.theme-zoom {
+  --phos: #2bffb0;
+  --phos-dk: #0b8a5c;
+  --lab: #0a1214;
+  background-color: var(--lab);
+  background-image: radial-gradient(70% 45% at 50% 30%, rgba(43, 255, 176, 0.08), transparent 70%);
+  color: #d9fff0;
+}
+
+.theme-zoom .eyebrow {
+  color: rgba(217, 255, 240, 0.7);
+}
+
+.theme-zoom .label {
+  color: var(--ink);
+}
+
+.ze-monitor {
+  position: relative;
+  width: min(100%, 400px);
+  aspect-ratio: 1 / 1;
+  align-self: center;
+  border: 4px solid #2a3a3c;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 0 0 2px var(--phos-dk), 0 0 24px rgba(43, 255, 176, 0.25);
+  background: #000;
+}
+
+.ze-monitor canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ze-rec {
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  font-size: 0.95rem;
+  color: var(--phos);
+  text-shadow: 0 0 8px var(--phos);
+  animation: pulse 1.2s infinite;
+}
+
+.ze-clock {
+  font-family: var(--font-game);
+  font-size: 1.4rem;
+  color: var(--phos);
+}
+
+.ze-picks {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.ze-pick {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 6px 8px;
+  border: 2px solid var(--phos-dk);
+  border-radius: 12px;
+  background: #102022;
+  color: #d9fff0;
+  font-family: var(--font-game);
+  text-transform: uppercase;
+  text-align: left;
+  min-width: 0;
+}
+
+.ze-pick .nm {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ze-pick.on {
+  border-color: var(--phos);
+  background: var(--phos-dk);
+  box-shadow: 0 0 12px rgba(43, 255, 176, 0.45);
+}
+
+.ze-pick:disabled:not(.on) {
+  opacity: 0.45;
+}
+
+.ze-id {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px;
+  border: 2px dashed var(--phos);
+  border-radius: 12px;
+  color: var(--phos);
+  font-size: 1.1rem;
+}
+
+.ze-miss {
+  opacity: 0.7;
+}

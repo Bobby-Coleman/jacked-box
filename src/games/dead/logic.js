@@ -164,7 +164,8 @@ function finish(ctx, g) {
   for (const p of escaped) if (p !== winner) ctx.award(g, p, 1500);
   if (winner) ctx.award(g, winner, 3000);
   g.winner = winner;
-  ctx.say('dead.escape');
+  if (winner && escaped.includes(winner)) ctx.sayName('dead.winner', winner);
+  else ctx.say('dead.escape');
   const awards = [];
   if (winner) awards.push({ pid: winner, title: g.pos[winner] >= EXIT ? 'Escaped the gym' : 'Got the furthest', detail: '+3,000 bonus' });
   const ghosts = Object.keys(g.dead).filter((p) => g.dead[p] && ctx.exists(p));

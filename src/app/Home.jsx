@@ -1,7 +1,8 @@
 import { useState } from 'preact/hooks';
 import { AvatarSvg, Boxter, randomAvatar, AV_PARTS } from '../ui/Avatar.jsx';
 import { Icon, Sheet, useStore } from '../ui/common.jsx';
-import { profile, saveProfile, createParty, joinParty, lastRoom, cleanCode, clearError } from './session.js';
+import { profile, saveProfile, createParty, joinParty, lastRoom, cleanCode, clearError, myFace, saveFace } from './session.js';
+import { FaceCam } from '../ui/FaceCam.jsx';
 import { unlock } from '../audio/audio.js';
 import { sfx } from '../audio/sfx.js';
 import { cleanName } from '../engine/core.js';
@@ -76,7 +77,7 @@ export function Home() {
         ) : (
           <div class="row">
             <button class="avatar-btn" onClick={() => setEditing(true)} aria-label="Change your look">
-              <AvatarSvg av={av} color={PREVIEW_COLOR} size={64} />
+              <AvatarSvg av={av} color={PREVIEW_COLOR} size={64} face={myFace()} />
               <span class="avatar-edit-dot">
                 <Icon name="dice" size={14} stroke={2.4} />
               </span>
@@ -209,15 +210,52 @@ function InstallHint() {
 const PART_LABELS = { e: 'Eyes', m: 'Mouth', h: 'Headwear', b: 'Box' };
 
 export function AvatarEditor({ av, color = PREVIEW_COLOR, onChange, onClose }) {
+  const [cam, setCam] = useState(false);
+  const [, bump] = useState(0);
+  const face = myFace();
   const step = (k, d) => {
     sfx('tap');
     const n = AV_PARTS[k];
     onChange({ ...av, [k]: (av[k] + d + n) % n });
   };
+  if (cam) {
+    return (
+      <FaceCam
+        onCancel={() => setCam(false)}
+        onDone={(img) => {
+          saveFace(img);
+          setCam(false);
+          bump((v) => v + 1);
+        }}
+      />
+    );
+  }
   return (
     <Sheet title="Your look" onClose={onClose}>
       <div class="avatar-stage">
-        <AvatarSvg av={av} color={color} size={150} />
+        <AvatarSvg av={av} color={color} size={150} face={face} />
+      </div>
+      <div class="label tight face-card">
+        <div class="col" style={{ gap: 2, flex: 1, minWidth: 0 }}>
+          <strong>{face ? 'Your face is in the box!' : 'Put your face in the box'}</strong>
+          <span class="small muted">{face ? 'It shows on your avatar and stars in the face games.' : 'Face games use selfies: Photobomb, Zoom & Enhance, Frankenface and more.'}</span>
+        </div>
+        <div class="col" style={{ gap: 6 }}>
+          <button class="btn sm primary" onClick={() => setCam(true)}>
+            {face ? 'Retake' : 'Add selfie'}
+          </button>
+          {face && (
+            <button
+              class="btn sm ghost"
+              onClick={() => {
+                saveFace(null);
+                bump((v) => v + 1);
+              }}
+            >
+              Remove
+            </button>
+          )}
+        </div>
       </div>
       {['h', 'e', 'm', 'b'].map((k) => (
         <div class="part-row" key={k}>

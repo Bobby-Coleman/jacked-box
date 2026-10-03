@@ -135,6 +135,32 @@ export function joinUrl(code) {
   return u.toString();
 }
 
+// Save an image: the phone's share sheet (save to photos, send to the group chat),
+// falling back to a download link on desktop browsers.
+export async function saveImage(dataUrl, filename = 'jacked-box.png') {
+  try {
+    const blob = await (await fetch(dataUrl)).blob();
+    const file = new File([blob], filename, { type: blob.type || 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: 'Jacked Box' });
+      return 'shared';
+    }
+  } catch (e) {
+    if (e && e.name === 'AbortError') return 'cancelled';
+  }
+  try {
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    return 'downloaded';
+  } catch (e) {
+    return 'failed';
+  }
+}
+
 // ---------- install as an app (PWA) ----------
 let installEvent = null;
 const installSubs = new Set();

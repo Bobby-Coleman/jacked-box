@@ -58,7 +58,7 @@ function score(ctx, g) {
     res.odd = singles[0].pids[0];
     if (g.odd !== res.odd) {
       g.odd = res.odd;
-      ctx.say('herd.odd');
+      ctx.sayName('herd.odd', res.odd);
     }
   }
   g.res = res;

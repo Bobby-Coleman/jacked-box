@@ -4,6 +4,7 @@ import { randomId } from '../net/mqtt.js';
 import { engine } from '../engine/core.js';
 import { load, save, sload, ssave, keepAwake } from '../platform.js';
 import { randomAvatar } from '../ui/Avatar.jsx';
+import { setBlobResolver } from '../ui/faceRegistry.js';
 
 // Consonants only: no accidental words, nothing that looks like 0/O or 1/I.
 const CODE_CHARS = 'BCDFGHJKLMNPQRSTVWXZ';
@@ -60,8 +61,30 @@ export function profile() {
     id: myId(),
     name: saved.name || '',
     av: saved.av || randomAvatar(),
+    face: myFace(),
   };
 }
+
+// The player's selfie lives on this device only; it's sent (encrypted) to rooms they join.
+export function myFace() {
+  const f = sload('jb.face');
+  if (f === 'none') return null;
+  return f || load('jb.face') || null;
+}
+
+export function saveFace(img) {
+  save('jb.face', img || null);
+  ssave('jb.face', img || 'none');
+  const link = store.link;
+  if (link && link.state && link.state.players[link.me.id]) link.send('face', { img: img || null });
+  emit();
+}
+
+setBlobResolver((id) => (store.link ? store.link.blob(id) : null));
+
+// Dev only: the session owns the live room connection, so swapping it (or the engine below it)
+// in place would strand the old connection. Reload the page instead.
+if (import.meta.hot) import.meta.hot.accept(() => location.reload());
 
 export function saveProfile(p) {
   save('jb.me', { name: p.name, av: p.av });
@@ -90,9 +113,17 @@ function setUrlCode(code) {
 function attach(link) {
   store.link = link;
   store.wasIn = false;
+  let faceSent = false;
   link.on(() => {
     const s = link.state;
-    if (s && s.players && s.players[link.me.id]) store.wasIn = true;
+    if (s && s.players && s.players[link.me.id]) {
+      store.wasIn = true;
+      const face = myFace();
+      if (!faceSent && face && !s.players[link.me.id].face && !link.me.screen) {
+        faceSent = true;
+        link.send('face', { img: face });
+      }
+    }
     if (s && s.closed) {
       endWith('The VIP ended the party. Thanks for playing!');
       return;

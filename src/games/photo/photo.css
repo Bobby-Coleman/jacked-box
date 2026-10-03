@@ -1,0 +1,156 @@
+/* PHOTOBOMB — a gallery opening. Deep museum-wall teal, gilded frames, brass plaques. */
+.theme-photo {
+  --wall: #1e4d4a;
+  --gold: #e3b23c;
+  --gold-dk: #9c7316;
+  --plaque: #f4e7c5;
+  background-color: var(--wall);
+  background-image:
+    radial-gradient(60% 35% at 50% 0%, rgba(255, 240, 200, 0.22), transparent 70%),
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.06) 0 2px, transparent 2px 22px);
+  color: #f6efe0;
+}
+
+.theme-photo .eyebrow {
+  color: rgba(246, 239, 224, 0.75);
+}
+
+.theme-photo .label {
+  color: var(--ink);
+}
+
+.pb-prompt {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 3px solid var(--ink);
+  border-radius: 12px;
+  background: var(--plaque);
+  color: var(--ink);
+  box-shadow: 4px 4px 0 var(--gold-dk);
+}
+
+.pb-prompt strong {
+  font-size: 1.35rem;
+  line-height: 1.1;
+}
+
+.pb-frame {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border: 10px solid var(--gold);
+  border-radius: 6px;
+  outline: 3px solid var(--ink);
+  background: var(--plaque);
+  color: var(--ink);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  align-self: center;
+  width: min(100%, 440px);
+}
+
+.pb-frame .drawing-frame {
+  box-shadow: none;
+}
+
+.pb-plaque {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: center;
+  align-items: center;
+}
+
+.pb-plaque strong {
+  font-size: 1.25rem;
+  line-height: 1.1;
+}
+
+.pad-mode {
+  align-self: center;
+}
+
+.drawing-frame.pad.moving canvas {
+  cursor: move;
+}
+
+.pb-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.pb-thumb {
+  appearance: none;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px;
+  border: 3px solid var(--ink);
+  border-radius: 12px;
+  background: var(--plaque);
+  color: var(--ink);
+  text-align: left;
+  min-width: 0;
+}
+
+.pb-thumb .drawing-frame {
+  box-shadow: none;
+  border-width: 2px;
+}
+
+.pb-thumb.on {
+  background: var(--gold);
+  box-shadow: 0 0 0 3px var(--plaque);
+}
+
+.pb-thumb.own {
+  opacity: 0.6;
+}
+
+.pb-thumb .badge {
+  position: absolute;
+  top: -10px;
+  right: 6px;
+}
+
+.pb-thumb-title {
+  font-family: var(--font-game);
+  font-size: 0.82rem;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.pb-result {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  border: 3px solid var(--ink);
+  border-radius: 12px;
+  background: var(--plaque);
+  color: var(--ink);
+}
+
+.pb-result.top {
+  background: #fff1c2;
+  box-shadow: 0 0 0 4px var(--gold), 4px 4px 0 var(--ink);
+}
+
+.pb-result-art {
+  width: 40%;
+  flex: none;
+}
+
+.pb-result-art .drawing-frame {
+  box-shadow: none;
+  border-width: 2px;
+}
+
+.pb-result-title {
+  font-size: 1rem;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}

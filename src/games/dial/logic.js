@@ -43,7 +43,7 @@ function nextRound(ctx, g) {
     pts: {},
   };
   ctx.phase(g, 'clue', 70000);
-  ctx.say('dial.clue');
+  ctx.sayName('dial.clue', psychic);
 }
 
 function startGuess(ctx, g) {

@@ -1,7 +1,9 @@
-// Host voice: plays BOXTER's pre-rendered lines, falls back to the phone's own
-// text-to-speech for anything dynamic (prompts, player answers, names).
+// Host voice: plays BOXTER's pre-rendered lines (and pre-rendered player names), and falls
+// back to the phone's own text-to-speech only for what can't be pre-rendered: things players
+// typed, like answers and crimes.
 import { getCtx, buses, duck } from './audio.js';
-import { clipName } from './clipname.js';
+import { clipName, nameClip, nameFirst, lineSpoken } from './clipname.js';
+import { LINES } from '../content/voice.js';
 
 let manifest = null; // Set of available clip names
 let manifestVer = '1';
@@ -52,16 +54,63 @@ export async function preloadLines(keys) {
   }
 }
 
+// Robotic or novelty system voices we never want reading answers.
+const ROBOTIC = /espeak|\bfred\b|albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|good news|hysterical|jester|organ|superstar|trinoids|whisper|wobble|zarvox|junior|ralph|kathy|princess|grandma|grandpa|rocko|shelley|sandy|eddy|flo|reed/i;
+const OLD_SAPI = /^microsoft (david|zira|mark|hazel|george|susan|james|catherine|ravi|heera)\b(?!.*(online|natural))/i;
+
+// Score the device's voices and take the most natural-sounding English one:
+// neural/online voices first (Edge "Natural", Google, Siri-era "Enhanced"/"Premium").
+function voiceScore(v) {
+  const n = v.name || '';
+  if (ROBOTIC.test(n) || OLD_SAPI.test(n)) return -100;
+  let s = 0;
+  if (/natural|neural/i.test(n)) s += 60;
+  if (/premium/i.test(n)) s += 50;
+  if (/enhanced/i.test(n)) s += 40;
+  if (/^google/i.test(n)) s += 30;
+  if (/\b(aaron|evan|nathan|tom|alex|daniel|samantha|ava|zoe|allison|nicky|guy|andrew|brian|christopher|eric|ryan)\b/i.test(n)) s += 15;
+  if (/en[-_]us/i.test(v.lang)) s += 8;
+  else if (/en[-_](gb|au|ca|ie|nz)/i.test(v.lang)) s += 4;
+  if (v.localService === false) s += 2; // network voices are usually the neural ones
+  return s;
+}
+
 function pickVoice() {
   if (ttsVoice) return ttsVoice;
   const vs = (window.speechSynthesis && window.speechSynthesis.getVoices()) || [];
-  const en = vs.filter((v) => /^en[-_]/i.test(v.lang));
-  const prefer = [/aaron/i, /evan/i, /nathan/i, /google us english/i, /daniel/i, /alex/i, /fred/i, /arthur/i, /samantha/i, /natural/i, /enhanced/i, /premium/i];
-  for (const re of prefer) {
-    const v = en.find((x) => re.test(x.name));
-    if (v) return (ttsVoice = v);
+  const en = vs.filter((v) => /^en([-_]|$)/i.test(v.lang));
+  let best = null;
+  let bestScore = -Infinity;
+  for (const v of en) {
+    const sc = voiceScore(v);
+    if (sc > bestScore) {
+      best = v;
+      bestScore = sc;
+    }
   }
-  return (ttsVoice = en.find((v) => /en-US/i.test(v.lang)) || en[0] || null);
+  return (ttsVoice = best);
+}
+
+// Which clips to play for a cue, in order. Null means "no clips: use the device voice".
+function clipsFor(cue, m) {
+  if (cue.k == null) {
+    const name = clipName(cue.tts || cue.t);
+    return m.has(name) ? [name] : null;
+  }
+  const tpl = (LINES[cue.k] || [])[cue.i] || '';
+  const key = `${cue.k}-${cue.i}`;
+  const hasLine = !!lineSpoken(tpl);
+  if (hasLine && !m.has(key)) return null;
+  const parts = hasLine ? [key] : [];
+  if (tpl.includes('{name}') && cue.name) {
+    const n = nameClip(cue.name);
+    // Names we haven't pre-rendered are left to the caption.
+    if (n && m.has(n)) {
+      if (nameFirst(tpl)) parts.unshift(n);
+      else parts.push(n);
+    }
+  }
+  return parts;
 }
 
 if (typeof window !== 'undefined' && window.speechSynthesis) {
@@ -120,14 +169,15 @@ async function pump() {
     const cue = queue.shift();
     duck(true);
     try {
-      let played = false;
       const m = await loadManifest();
       // Host lines are keyed; static prompts are looked up by their text.
-      const name = cue.k != null ? `${cue.k}-${cue.i}` : clipName(cue.tts || cue.t);
-      if (m.has(name)) {
-        const buf = await getBuffer(name);
-        if (buf) {
-          await playBuffer(buf);
+      const parts = clipsFor(cue, m);
+      let played = false;
+      if (parts) {
+        // Fetch all parts up front so a name and its line play back to back.
+        const bufs = await Promise.all(parts.map(getBuffer));
+        if (bufs.every(Boolean)) {
+          for (const buf of bufs) await playBuffer(buf);
           played = true;
         }
       }

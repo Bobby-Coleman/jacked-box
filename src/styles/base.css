@@ -594,7 +594,7 @@ textarea.field {
   position: absolute;
   left: 10px;
   right: 10px;
-  top: calc(var(--safe-t) + 64px);
+  top: 6px;
   display: flex;
   align-items: flex-start;
   gap: 8px;

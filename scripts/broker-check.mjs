@@ -2,7 +2,7 @@
 // retained-message delivery to a fresh connection, and a ~40KB payload.
 import { MqttClient, randomId, decodeText } from '../src/net/mqtt.js';
 
-const CANDIDATES = [
+const CANDIDATES = process.argv.slice(2).length ? process.argv.slice(2) : [
   'wss://broker.emqx.io:8084/mqtt',
   'wss://broker.hivemq.com:8884/mqtt',
   'wss://test.mosquitto.org:8081/mqtt',

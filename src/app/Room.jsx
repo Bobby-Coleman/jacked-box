@@ -27,6 +27,7 @@ export function Room() {
   const meId = link.me.id;
   const me = s.players[meId];
   const isVip = s.vip === meId;
+  if (typeof document !== 'undefined') document.body.classList.toggle('tv', !!(me && me.screen));
   const g = s.game;
   const title = s.scene === 'game' && g ? (GAME_META[g.id] || {}).name : s.scene === 'results' ? 'Results' : 'Lobby';
 
@@ -50,6 +51,7 @@ export function Room() {
       {reacting && s.scene !== 'lobby' && <ReactTray onClose={() => setReacting(false)} />}
       <AudioDirector s={s} meId={meId} />
       <main class="room-main" key={s.scene + (g ? g.id : '')}>
+        <Caption s={s} />
         {!me ? (
           <Joining />
         ) : s.scene === 'game' && g ? (
@@ -60,7 +62,6 @@ export function Room() {
           <Lobby onShare={() => setShareOpen(true)} onEditMe={() => setEditMe(true)} />
         )}
       </main>
-      <Caption s={s} />
       <ReactLayer s={s} />
       {menu && <Menu s={s} meId={meId} isVip={isVip} onClose={() => setMenu(false)} onEditMe={() => setEditMe(true)} />}
       {shareOpen && <ShareSheet code={s.code} onClose={() => setShareOpen(false)} />}

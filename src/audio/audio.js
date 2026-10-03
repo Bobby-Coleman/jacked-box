@@ -81,7 +81,10 @@ export function unlock() {
   }
   const a = ensure();
   if (!a) return;
-  if (a.state !== 'running') a.resume().catch(() => {});
+  const notify = () => {
+    for (const fn of stateListeners) fn(a.state);
+  };
+  if (a.state !== 'running') a.resume().then(notify, () => {});
   if (!unlocked) {
     const b = a.createBuffer(1, 1, 22050);
     const s = a.createBufferSource();
@@ -89,6 +92,8 @@ export function unlock() {
     s.connect(a.destination);
     s.start(0);
     unlocked = true;
+    // A context created inside a tap may already be running: no statechange event will come.
+    setTimeout(notify, 0);
   }
   try {
     if (!speechWarm && window.speechSynthesis) {

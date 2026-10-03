@@ -1,10 +1,10 @@
 import { useEffect, useRef } from 'preact/hooks';
-import { useStore, Icon, send } from '../ui/common.jsx';
+import { useStore, Icon, send, QR } from '../ui/common.jsx';
 import { PlayerAvatar } from '../ui/Avatar.jsx';
 import { GAME_LIST } from '../games/logic.js';
 import { GAME_META, GameGlyph } from '../games/meta.jsx';
 import { sfx } from '../audio/sfx.js';
-import { appUrl } from '../platform.js';
+import { appUrl, joinUrl } from '../platform.js';
 
 // Hidden test mode: add ?dev=1 to the URL to get bot players in the lobby.
 const DEV = typeof location !== 'undefined' && new URLSearchParams(location.search).has('dev');
@@ -30,6 +30,9 @@ export function Lobby({ onShare, onEditMe }) {
   }, [players.length]);
 
   const empties = Math.max(0, 4 - players.length);
+  const amScreen = !!(s.players[meId] && s.players[meId].screen);
+
+  if (amScreen) return <ScreenLobby s={s} players={players} host={host} />;
 
   return (
     <div class="screen lobby">
@@ -77,6 +80,8 @@ export function Lobby({ onShare, onEditMe }) {
         </div>
       </section>
 
+      {s.played > 0 && <PartyStandings s={s} meId={meId} />}
+
       {isVip && DEV && (
         <div class="row" style={{ justifyContent: 'center' }}>
           <button class="btn sm" onClick={() => send('addbot', {})}>
@@ -104,38 +109,128 @@ export function Lobby({ onShare, onEditMe }) {
   );
 }
 
+function PartyStandings({ s, meId }) {
+  const ids = Object.keys(s.tally || {}).filter((id) => s.players[id] && s.tally[id] > 0);
+  if (!ids.length) return null;
+  ids.sort((a, b) => s.tally[b] - s.tally[a]);
+  return (
+    <section class="label tight col party-standings" aria-label="Party standings">
+      <span class="eyebrow">
+        Party trophies · {s.played} {s.played === 1 ? 'game' : 'games'} played
+      </span>
+      {ids.slice(0, 6).map((id, i) => (
+        <div class="row spread" key={id}>
+          <span class="player-chip">
+            <span class="tabular" style={{ width: 18, fontWeight: 800 }}>
+              {i + 1}
+            </span>
+            <PlayerAvatar p={s.players[id]} size={28} />
+            <span class="nm" style={{ color: id === meId ? 'var(--stamp-dk)' : undefined }}>
+              {s.players[id].name}
+            </span>
+          </span>
+          <span class="trophies" aria-label={`${s.tally[id]} trophies`}>
+            {'🏆'.repeat(Math.min(5, s.tally[id]))}
+            {s.tally[id] > 5 ? ` ×${s.tally[id]}` : ''}
+          </span>
+        </div>
+      ))}
+    </section>
+  );
+}
+
+// Lobby for a shared table screen / TV: big code, QR right there, no player controls.
+function ScreenLobby({ s, players, host }) {
+  const vip = s.players[s.vip];
+  return (
+    <div class="screen lobby tv-lobby">
+      <section class="label tape tv-join" aria-label="How to join">
+        <div class="col" style={{ gap: 6, minWidth: 0 }}>
+          <span class="eyebrow">Join on your phone</span>
+          <strong class="tv-url">{host}</strong>
+          <span class="eyebrow">Room code</span>
+          <div class="code-big stencil" aria-label={`Room code ${s.code}`}>
+            {s.code.split('').map((c, i) => (
+              <span key={i}>{c}</span>
+            ))}
+          </div>
+        </div>
+        <div class="qr-wrap">
+          <QR text={joinUrl(s.code)} size={190} />
+        </div>
+      </section>
+      <section class="col">
+        <span class="eyebrow">
+          {players.length} {players.length === 1 ? 'player' : 'players'} in the box
+        </span>
+        <div class="roster">
+          {players.map((p) => (
+            <div class={'roster-item pop-in' + (p.on === false ? ' off' : '')} key={p.id}>
+              <PlayerAvatar p={p} size={72} />
+              <span class="nm">{p.name}</span>
+              {p.id === s.vip && <span class="badge vip-badge">VIP</span>}
+            </div>
+          ))}
+        </div>
+      </section>
+      <div class="label tight center-text">
+        {players.length === 0 ? 'The first person to join becomes the VIP and picks the games.' : `${vip ? vip.name : 'The VIP'} picks the games from their phone.`}
+      </div>
+      {s.pick && <GameCard id={s.pick} active={players.length} selected />}
+    </div>
+  );
+}
+
+const SHELVES = [
+  { title: 'Write, draw & bluff', ids: ['zinger', 'fib', 'sketch', 'phone', 'dead'] },
+  { title: 'Talk it out', ids: ['blend', 'herd', 'seat', 'dial'] },
+  { title: 'Phones on the table', ids: ['bomb', 'noon', 'head'] },
+];
+
 function GamePicker({ s, active }) {
   const pick = s.pick;
+  const byId = Object.fromEntries(GAME_LIST.map((g) => [g.id, g]));
+  const listed = new Set(SHELVES.flatMap((sh) => sh.ids));
+  const extra = GAME_LIST.filter((g) => !listed.has(g.id)).map((g) => g.id);
+  const shelves = extra.length ? SHELVES.concat([{ title: 'More', ids: extra }]) : SHELVES;
   return (
     <section class="col" aria-label="Pick a game">
       <span class="eyebrow">You're the VIP. Pick a game.</span>
-      <div class="game-list">
-        {GAME_LIST.map((mod) => (
-          <div key={mod.id} class="col" style={{ gap: 8 }}>
-            <GameCard
-              id={mod.id}
-              active={active}
-              selected={pick === mod.id}
-              onClick={() => {
-                sfx('tap');
-                send('pick', { id: pick === mod.id ? null : mod.id });
-              }}
-            />
-            {pick === mod.id && (
-              <button
-                class="btn primary slide-in"
-                disabled={active < mod.min}
-                onClick={() => {
-                  sfx('bell');
-                  send('start', { id: mod.id });
-                }}
-              >
-                {active < mod.min ? `Need ${mod.min - active} more ${mod.min - active === 1 ? 'player' : 'players'}` : `Start ${mod.name}`}
-              </button>
-            )}
+      {shelves.map((sh) => (
+        <div class="col" key={sh.title} style={{ gap: 10 }}>
+          <h2 class="shelf-title stencil">{sh.title}</h2>
+          <div class="game-list">
+            {sh.ids
+              .map((id) => byId[id])
+              .filter(Boolean)
+              .map((mod) => (
+                <div key={mod.id} class="col" style={{ gap: 8 }}>
+                  <GameCard
+                    id={mod.id}
+                    active={active}
+                    selected={pick === mod.id}
+                    onClick={() => {
+                      sfx('tap');
+                      send('pick', { id: pick === mod.id ? null : mod.id });
+                    }}
+                  />
+                  {pick === mod.id && (
+                    <button
+                      class="btn primary slide-in"
+                      disabled={active < mod.min}
+                      onClick={() => {
+                        sfx('bell');
+                        send('start', { id: mod.id });
+                      }}
+                    >
+                      {active < mod.min ? `Need ${mod.min - active} more ${mod.min - active === 1 ? 'player' : 'players'}` : `Start ${mod.name}`}
+                    </button>
+                  )}
+                </div>
+              ))}
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </section>
   );
 }

@@ -8,3 +8,4 @@ scripts/voice-cache/
 scripts/voice-gen.log
 tools/node_modules/
 .claude/
+scripts/voice-gen*.log

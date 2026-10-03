@@ -3,7 +3,7 @@
 // receipt by a random message id, so a broker outage is invisible to the game.
 import { MqttClient, randomId, decodeText } from './mqtt.js';
 
-export const PRIMARY_BROKERS = ['wss://broker.emqx.io:8084/mqtt', 'wss://broker.hivemq.com:8884/mqtt'];
+export const PRIMARY_BROKERS = ['wss://broker.emqx.io:8084/mqtt', 'wss://broker.hivemq.com:8884/mqtt', 'wss://public:public@public.cloud.shiftr.io'];
 export const FALLBACK_BROKERS = ['wss://test.mosquitto.org:8081/mqtt'];
 
 export class PubSub {

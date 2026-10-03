@@ -10,8 +10,8 @@ import { unlock } from './audio/audio.js';
 render(<App />, document.getElementById('app'));
 
 if (import.meta.env.DEV) {
-  import('./app/session.js').then((m) => {
-    window.__jb = m;
+  Promise.all([import('./app/session.js'), import('./audio/audio.js'), import('./audio/music.js')]).then(([session, audio, music]) => {
+    window.__jb = { ...session, audio, music };
   });
 }
 

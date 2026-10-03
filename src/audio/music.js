@@ -94,6 +94,22 @@ const TRACKS = {
     keys: '..x...x...x...x.', keysType: 'triangle', keysVol: 0.05,
     arp: null,
   },
+  dead: {
+    bpm: 84, swing: 0,
+    chords: [[45, 48, 52], [46, 49, 53], [45, 48, 52], [44, 47, 51]],
+    bass: '1.......1...1...', bassType: 'sawtooth', bassVol: 0.32,
+    drums: { k: 'x.......x.......', h: '....x.......x...', t: '..............x.' },
+    keys: 'x...............', keysType: 'triangle', keysVol: 0.05, keysLen: 15,
+    arp: { pat: [2, 1, 0, 1], every: 2, oct: 12, type: 'sine', vol: 0.05, gate: 'x...x...x...x.x.', delay: true },
+  },
+  seat: {
+    bpm: 102, swing: 0.12,
+    chords: [[50, 53, 57], [50, 53, 57], [46, 50, 53], [45, 49, 52]],
+    bass: '1..1..1.1..1..5.', bassType: 'triangle', bassVol: 0.5,
+    drums: { k: 'x.....x.x.......', s: '....x.......x...', h: 'x.x.x.x.x.x.x.x.' },
+    keys: '..x...x...x...x.', keysType: 'square', keysVol: 0.035,
+    arp: null,
+  },
   results: {
     bpm: 108, swing: 0.05,
     chords: [[60, 64, 67], [53, 57, 60], [55, 59, 62], [60, 64, 67]],
@@ -256,7 +272,7 @@ function schedule() {
 
 export function playMusic(name) {
   const ac = getCtx();
-  const id = TRACKS[name] ? name : null;
+  const id = !name ? null : TRACKS[name] ? name : 'lobby';
   if (current && current.id === id) return;
   stopMusic();
   if (!ac || !id) return;

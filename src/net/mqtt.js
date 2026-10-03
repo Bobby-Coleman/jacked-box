@@ -63,7 +63,11 @@ export function randomId(len = 12) {
 
 export class MqttClient {
   constructor(url, opts = {}) {
-    this.url = url;
+    // Credentials may be given as wss://user:pass@host/… (stripped before connecting).
+    const m = /^(wss?:\/\/)([^:@/]+):([^@/]*)@(.*)$/.exec(url);
+    this.url = m ? m[1] + m[4] : url;
+    this.username = opts.username || (m ? decodeURIComponent(m[2]) : null);
+    this.password = opts.password || (m ? decodeURIComponent(m[3]) : null);
     this.clientId = opts.clientId || 'jbx_' + randomId(14);
     this.keepalive = opts.keepalive || 25; // seconds
     this.onMessage = opts.onMessage || (() => {});
@@ -111,9 +115,18 @@ export class MqttClient {
     this.ws = ws;
     ws.onopen = () => {
       if (ws !== this.ws) return;
-      const flags = 0x02; // clean session
+      let flags = 0x02; // clean session
+      const parts = [mstr(this.clientId)];
+      if (this.username != null) {
+        flags |= 0x80;
+        parts.push(mstr(this.username));
+        if (this.password != null) {
+          flags |= 0x40;
+          parts.push(mstr(this.password));
+        }
+      }
       const vh = new Uint8Array([0, 4, 77, 81, 84, 84, 4, flags, ...u16(this.keepalive)]);
-      this._raw(packet(1, 0, [vh, mstr(this.clientId)]));
+      this._raw(packet(1, 0, [vh, ...parts]));
     };
     ws.onmessage = (ev) => {
       if (ws !== this.ws) return;

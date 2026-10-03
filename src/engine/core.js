@@ -64,6 +64,7 @@ export function createRoom({ code, me, settings, now }) {
     cueN: 0,
     music: 'lobby',
     used: {},
+    tally: {},
     blobs: [],
     reacts: [],
     reactN: 0,
@@ -253,6 +254,16 @@ function finishGame(s, g, now, extra) {
   s.game = null;
   s.music = 'results';
   s.played = (s.played || 0) + 1;
+  // Party trophies across games: 3 for 1st, 2 for 2nd, 1 for 3rd (ties share).
+  s.tally = s.tally || {};
+  let place = 0;
+  let prev = null;
+  ranking.forEach((pid, i) => {
+    const sc = g.scores[pid];
+    if (sc !== prev) place = i + 1;
+    prev = sc;
+    if (place <= 3 && sc > 0) s.tally[pid] = (s.tally[pid] || 0) + (4 - place);
+  });
   const ctx = makeCtx(s, now);
   if (!extra.coop) ctx.say('results.winner');
 }

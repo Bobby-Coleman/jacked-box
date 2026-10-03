@@ -1,0 +1,16 @@
+{
+  "name": "jacked-box-tools",
+  "private": true,
+  "type": "module",
+  "description": "Offline asset tools: voice rendering (Kokoro TTS) and icon rendering. Not needed to run or build the game.",
+  "scripts": {
+    "voice": "node gen-voice.mjs",
+    "voice:lines": "node gen-voice.mjs --lines",
+    "icons": "node make-icons.mjs"
+  },
+  "dependencies": {
+    "@breezystack/lamejs": "^1.2.7",
+    "kokoro-js": "^1.2.1",
+    "sharp": "^0.35.5"
+  }
+}

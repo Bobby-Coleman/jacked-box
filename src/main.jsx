@@ -1,0 +1,30 @@
+import { render } from 'preact';
+import '@fontsource/big-shoulders-stencil-display/latin-900';
+import '@fontsource/lilita-one/latin-400';
+import '@fontsource-variable/bricolage-grotesque/wght';
+import './styles/base.css';
+import './styles/app.css';
+import { App } from './app/App.jsx';
+import { unlock } from './audio/audio.js';
+
+render(<App />, document.getElementById('app'));
+
+if (import.meta.env.DEV) {
+  import('./app/session.js').then((m) => {
+    window.__jb = m;
+  });
+}
+
+// Any first touch unlocks audio (phones block sound until the user interacts).
+const firstTouch = () => {
+  unlock();
+};
+window.addEventListener('pointerdown', firstTouch, { passive: true });
+window.addEventListener('keydown', firstTouch);
+
+// Offline-capable shell + faster reloads at parties with bad Wi-Fi.
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}

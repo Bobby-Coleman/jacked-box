@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.DS_Store
+*.log
+scripts/.cache/
+scripts/voice-cache/
+.claude/settings.local.json
+scripts/voice-gen.log
+tools/node_modules/
+.claude/

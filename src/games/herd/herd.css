@@ -1,0 +1,189 @@
+/* MOOJORITY — pasture. Grass green with a soft sky band; black-and-white cow spots; pink Odd Cow. */
+.theme-herd {
+  --grass: #8fcf5a;
+  --grass-dk: #5e9c33;
+  --sky: #bfe8ff;
+  --oddpink: #ff7ac6;
+  background-color: var(--grass);
+  background-image:
+    linear-gradient(var(--sky), var(--sky)),
+    radial-gradient(ellipse at 20% 100%, rgba(0, 0, 0, 0.08) 0 40%, transparent 41%),
+    repeating-linear-gradient(100deg, rgba(0, 0, 0, 0.04) 0 3px, transparent 3px 9px);
+  background-size: 100% 90px, 100% 100%, 100% 100%;
+  background-repeat: no-repeat, no-repeat, repeat;
+  color: #1d1611;
+}
+
+.hd-q {
+  padding: 16px;
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 5px 5px 0 var(--ink);
+  font-family: var(--font-game);
+  font-size: 1.6rem;
+  line-height: 1.12;
+  text-align: center;
+  background-image:
+    radial-gradient(circle at 8% 20%, #1d1611 0 9px, transparent 10px),
+    radial-gradient(circle at 92% 80%, #1d1611 0 12px, transparent 13px),
+    radial-gradient(circle at 96% 15%, #1d1611 0 5px, transparent 6px);
+}
+
+.hd-opts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.hd-opt {
+  appearance: none;
+  min-height: 64px;
+  padding: 10px;
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+  font-family: var(--font-game);
+  font-size: 1.2rem;
+  overflow-wrap: anywhere;
+}
+
+.hd-opt.on {
+  background: var(--hazard);
+}
+
+.hd-group {
+  appearance: none;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+  text-align: left;
+  font: inherit;
+}
+
+.hd-group.sel {
+  background: var(--hazard);
+  transform: translate(2px, 2px);
+}
+
+.hd-group.herd {
+  background: #fff;
+  box-shadow: 0 0 0 4px var(--ink), 6px 6px 0 var(--ink);
+  background-image: radial-gradient(circle at 92% 30%, #1d1611 0 10px, transparent 11px), radial-gradient(circle at 80% 85%, #1d1611 0 7px, transparent 8px);
+}
+
+.hd-group.mine {
+  border-style: dashed;
+}
+
+.hd-gtext {
+  font-family: var(--font-game);
+  font-size: 1.25rem;
+  text-transform: capitalize;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+.hd-count {
+  display: grid;
+  place-items: center;
+  min-width: 34px;
+  height: 34px;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: var(--grass);
+  font-family: var(--font-game);
+  font-size: 1.1rem;
+}
+
+.hd-herd-tag {
+  position: absolute;
+  top: -12px;
+  right: 12px;
+  padding: 2px 8px;
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+  background: var(--hazard);
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 0.95rem;
+}
+
+.hd-verdict {
+  padding: 12px;
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  font-family: var(--font-game);
+  font-size: 1.35rem;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.hd-verdict.yes {
+  background: var(--hazard);
+}
+
+.hd-verdict.no {
+  background: #fff;
+}
+
+.hd-odd {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  background: #ffe0f1;
+  font-weight: 700;
+  animation: popIn 0.4s both, wobble 1.2s 0.4s ease-in-out 2;
+}
+
+@keyframes wobble {
+  25% {
+    transform: rotate(-2deg);
+  }
+  75% {
+    transform: rotate(2deg);
+  }
+}
+
+.hd-standings {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.75);
+  margin-top: 6px;
+}
+
+.hd-stand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 30px;
+}
+
+.hd-stand.me .nm {
+  color: var(--stamp-dk);
+}
+
+.hd-cows {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1px;
+  justify-content: flex-end;
+}

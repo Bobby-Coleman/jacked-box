@@ -1,0 +1,104 @@
+/* HOT SEAT — interrogation lounge. Ember red, a single warm spotlight, cream cards. */
+.theme-seat {
+  --ember: #c4271c;
+  --ember-dk: #7d150e;
+  --spot: #ffd36b;
+  background-color: var(--ember);
+  background-image: radial-gradient(55% 40% at 50% 0%, rgba(255, 211, 107, 0.45), transparent 70%), repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.06) 0 2px, transparent 2px 7px);
+  color: #fff3e2;
+}
+
+.theme-seat .eyebrow {
+  color: rgba(255, 243, 226, 0.75);
+}
+
+.hs-q {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 16px;
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+  background: #fff7ea;
+  color: var(--ink);
+  box-shadow: 5px 5px 0 var(--ember-dk);
+  text-align: center;
+}
+
+.hs-lead {
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.8rem;
+  color: var(--ember);
+}
+
+.hs-q strong {
+  font-size: 1.6rem;
+  line-height: 1.1;
+}
+
+.hs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.hs-pick {
+  appearance: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 4px 8px;
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  background: #fff7ea;
+  color: var(--ink);
+  box-shadow: 3px 3px 0 var(--ember-dk);
+  min-width: 0;
+}
+
+.hs-pick .nm {
+  font-family: var(--font-game);
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hs-pick.on {
+  background: var(--spot);
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--ember-dk);
+}
+
+.hs-verdict {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  border: 3px solid var(--ink);
+  border-radius: 18px;
+  background: #fff7ea;
+  color: var(--ink);
+  box-shadow: 5px 5px 0 var(--ember-dk);
+}
+
+.hs-verdict.me {
+  background: var(--spot);
+  animation: popIn 0.4s both, mineGlow2 1s 0.4s ease-in-out 3;
+}
+
+@keyframes mineGlow2 {
+  50% {
+    box-shadow: 5px 5px 0 var(--ember-dk), 0 0 0 8px rgba(255, 211, 107, 0.5);
+  }
+}
+
+.hs-name {
+  font-size: 1.8rem;
+}

@@ -1,0 +1,126 @@
+/* TELEPHONEY — retro rotary-phone pink with mint accents and a curly-cord motif. */
+.theme-phone {
+  --mint: #18b39c;
+  --pink: #ff9fbe;
+  --pink-dk: #e0668e;
+  background-color: var(--pink);
+  background-image: radial-gradient(circle at 12px 12px, rgba(255, 255, 255, 0.28) 3px, transparent 4px);
+  background-size: 28px 28px;
+  color: #1d1611;
+}
+
+.ph-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 4px 4px 0 var(--ink);
+}
+
+.ph-card strong {
+  font-size: 1.4rem;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+}
+
+.ph-art {
+  width: min(100%, 420px);
+  align-self: center;
+}
+
+.ph-chain-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 3px solid var(--ink);
+  border-radius: 99px;
+  background: var(--mint);
+  align-self: flex-start;
+  box-shadow: var(--shadow-sm);
+}
+
+.ph-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 4px 4px 0 var(--ink);
+  position: relative;
+}
+
+.ph-entry + .ph-entry::before {
+  /* the curly phone cord between entries */
+  content: '';
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  width: 14px;
+  height: 18px;
+  margin-left: -7px;
+  background: repeating-linear-gradient(0deg, var(--ink) 0 3px, transparent 3px 6px);
+  border-radius: 6px;
+}
+
+.ph-entry .drawing-frame {
+  box-shadow: none;
+}
+
+.ph-text {
+  font-size: 1.45rem;
+  line-height: 1.15;
+  padding: 4px 2px;
+  overflow-wrap: anywhere;
+}
+
+.ph-blank {
+  padding: 30px;
+  text-align: center;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.like-pill {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border: 2.5px solid var(--ink);
+  border-radius: 99px;
+  background: #fff;
+  color: #c9b9a6;
+  font-weight: 800;
+  font-size: 0.85rem;
+  min-height: 34px;
+}
+
+.like-pill.on {
+  color: #ff3b5c;
+  background: #ffe3ea;
+}
+
+.like-pill.on svg {
+  fill: #ff3b5c;
+}
+
+.ph-end {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+  background: var(--mint);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+
+.ph-end strong {
+  font-size: 1.25rem;
+}

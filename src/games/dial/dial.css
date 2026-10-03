@@ -1,0 +1,107 @@
+/* MIND DIAL — late-night radio. Deep navy cabinet, cream dial face, tube-amp orange glow. */
+.theme-dial {
+  --navy: #15284a;
+  --cream: #ffe9c9;
+  --glow: #ff8a1f;
+  background-color: var(--navy);
+  background-image:
+    radial-gradient(60% 40% at 50% 30%, rgba(255, 138, 31, 0.16), transparent 70%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 5px);
+  color: var(--cream);
+}
+
+.theme-dial .eyebrow {
+  color: rgba(255, 233, 201, 0.7);
+}
+
+.theme-dial .label {
+  color: var(--ink);
+}
+
+.dl-psychic {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.dl-clue {
+  margin-left: auto;
+  padding: 8px 14px;
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  background: var(--glow);
+  color: var(--ink);
+  font-family: var(--font-game);
+  font-size: 1.35rem;
+  box-shadow: var(--shadow-sm);
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.dl-face {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dl-face svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+.dl-face svg.interactive {
+  touch-action: none;
+  cursor: grab;
+}
+
+.dl-num {
+  font-family: var(--font-game);
+  font-size: 10px;
+  fill: #fff;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.dl-target {
+  animation: dlReveal 0.6s ease-out both;
+  transform-origin: 110px 112px;
+}
+
+@keyframes dlReveal {
+  from {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+}
+
+.dl-ends {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.dl-end {
+  max-width: 48%;
+  padding: 6px 10px;
+  border: 3px solid var(--ink);
+  border-radius: 10px;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-game);
+  font-size: 1.05rem;
+  line-height: 1.1;
+  box-shadow: var(--shadow-sm);
+}
+
+.dl-end.r {
+  text-align: right;
+}
+
+.dl-range {
+  width: 100%;
+  accent-color: var(--glow);
+  height: 36px;
+}

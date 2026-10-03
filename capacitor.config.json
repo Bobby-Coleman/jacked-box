@@ -1,0 +1,12 @@
+{
+  "appId": "com.jackedbox.party",
+  "appName": "Jacked Box",
+  "webDir": "dist",
+  "backgroundColor": "#d9a466",
+  "ios": {
+    "contentInset": "never"
+  },
+  "android": {
+    "allowMixedContent": false
+  }
+}

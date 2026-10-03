@@ -1,0 +1,256 @@
+/* ZINGER RING — fight night. Navy arena, spotlight, red vs blue corners, gold ZINGER stamp. */
+.theme-zinger {
+  --red: #ff3b3b;
+  --blue: #2f7bff;
+  --gold: #ffc928;
+  --navy: #141d42;
+  background-color: #1d2a5c;
+  background-image:
+    radial-gradient(70% 45% at 50% 0%, rgba(255, 245, 210, 0.22), transparent 70%),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.07) 0 2px, transparent 2px 6px);
+  color: #fff;
+}
+
+.theme-zinger .eyebrow {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.zr-prompt {
+  font-size: 1.5rem;
+}
+
+.zr-final {
+  background: var(--gold);
+}
+
+.zr-ropes {
+  height: 14px;
+  margin: -4px -16px 0;
+  background:
+    linear-gradient(var(--red), var(--red)) 0 0 / 100% 3px no-repeat,
+    linear-gradient(#fff, #fff) 0 5.5px / 100% 3px no-repeat,
+    linear-gradient(var(--blue), var(--blue)) 0 11px / 100% 3px no-repeat;
+  opacity: 0.85;
+}
+
+.zr-vs {
+  display: grid;
+  place-items: center;
+  padding: 20px 0;
+}
+
+.zr-vs span {
+  display: grid;
+  place-items: center;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 4px solid var(--ink);
+  background: var(--gold);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 4rem;
+  box-shadow: 0 0 0 8px rgba(255, 201, 40, 0.25), var(--shadow);
+  animation: vsPulse 0.9s ease-in-out infinite;
+}
+
+@keyframes vsPulse {
+  50% {
+    transform: scale(1.08) rotate(-4deg);
+  }
+}
+
+.zr-pair {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.zr-ans {
+  appearance: none;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  padding: 26px 14px 14px;
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 5px 5px 0 var(--ink);
+  text-align: left;
+  font: inherit;
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+
+.zr-ans.a {
+  border-left: 12px solid var(--red);
+}
+
+.zr-ans.b {
+  border-left: 12px solid var(--blue);
+}
+
+.zr-ans.pickable:active {
+  transform: translate(3px, 3px);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+
+.zr-ans.picked {
+  background: #fff3c4;
+  box-shadow: 0 0 0 4px var(--gold), 5px 5px 0 var(--ink);
+}
+
+.zr-ans.ko {
+  background: #fff3c4;
+  animation: koShake 0.5s 0.4s;
+}
+
+@keyframes koShake {
+  25% {
+    transform: rotate(-2deg) scale(1.03);
+  }
+  75% {
+    transform: rotate(2deg) scale(1.03);
+  }
+}
+
+.zr-corner {
+  position: absolute;
+  top: 6px;
+  left: 12px;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.zr-text {
+  font-family: var(--font-game);
+  font-size: 1.45rem;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.zr-mine {
+  position: absolute;
+  top: -11px;
+  right: 10px;
+}
+
+.zr-reveal {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 8px;
+  border-top: 2px dashed rgba(29, 22, 17, 0.2);
+}
+
+.zr-pts {
+  margin-left: auto;
+  font-family: var(--font-game);
+  font-size: 1.3rem;
+  color: var(--ok);
+}
+
+.voters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.zr-stamp {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%) rotate(-12deg);
+  padding: 4px 10px;
+  border: 4px solid var(--red);
+  border-radius: 8px;
+  color: var(--red);
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 2rem;
+  background: rgba(255, 255, 255, 0.85);
+  animation: stampIn 0.35s 0.5s cubic-bezier(0.2, 1.8, 0.4, 1) both;
+  pointer-events: none;
+}
+
+@keyframes stampIn {
+  from {
+    transform: translateY(-50%) rotate(-12deg) scale(2.4);
+    opacity: 0;
+  }
+}
+
+.zr-jinx {
+  align-self: center;
+  padding: 4px 18px;
+  border: 4px solid var(--ink);
+  border-radius: 12px;
+  background: var(--gold);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 2.6rem;
+  transform: rotate(-4deg);
+}
+
+.zr-final-opt {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-height: 58px;
+  padding: 12px 14px;
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+  font-family: var(--font-game);
+  font-size: 1.15rem;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.zr-final-opt.on {
+  background: var(--gold);
+}
+
+.zr-final-opt.own {
+  opacity: 0.6;
+}
+
+.zr-final-opt:disabled {
+  cursor: default;
+}
+
+.zr-fres {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+}
+
+.zr-fres.top {
+  background: var(--gold);
+}
+
+.zr-fres-text {
+  font-family: var(--font-game);
+  font-size: 1.25rem;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}

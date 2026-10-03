@@ -1,0 +1,164 @@
+/* FOREHEAD — party neon. Highlighter yellow, hot pink, chunky words readable from across a couch. */
+.theme-head {
+  --hl: #ffde3b;
+  --hot: #ff3d8b;
+  background-color: var(--hl);
+  background-image: repeating-linear-gradient(-30deg, rgba(255, 61, 139, 0.12) 0 18px, transparent 18px 40px);
+  color: #1d1611;
+}
+
+.fh-big {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 18px;
+  border: 3px solid var(--ink);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 5px 5px 0 var(--ink);
+  text-align: center;
+  font-weight: 700;
+}
+
+.fh-big .stencil {
+  font-size: 2.6rem;
+  line-height: 0.9;
+}
+
+.fh-stage {
+  appearance: none;
+  flex: 1;
+  width: 100%;
+  display: grid;
+  place-items: center;
+  padding: 12px;
+  border: 0;
+  background: var(--hot);
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background 0.2s;
+}
+
+.fh-stage.ok,
+.fh-giver.ok {
+  background: #19b66a !important;
+}
+
+.fh-stage.skip,
+.fh-giver.skip {
+  background: #ff8a1f !important;
+}
+
+.fh-word-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.fh-word-wrap.rot {
+  transform: rotate(90deg);
+  width: 80dvh;
+  max-width: 80dvh;
+}
+
+.fh-word {
+  font-size: clamp(3.4rem, 15vw, 6.5rem);
+  line-height: 0.88;
+  text-shadow: 5px 5px 0 #1d1611;
+  overflow-wrap: anywhere;
+  animation: popIn 0.3s both;
+}
+
+.fh-word-wrap.rot .fh-word {
+  font-size: clamp(3.4rem, 11dvh, 7rem);
+}
+
+.fh-cat {
+  padding: 4px 12px;
+  border: 3px solid #1d1611;
+  border-radius: 99px;
+  background: var(--hl);
+  color: #1d1611;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.85rem;
+}
+
+.fh-score {
+  font-family: var(--font-game);
+  font-size: 1.3rem;
+}
+
+.fh-timer {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: calc(10px + var(--safe-b));
+  color: #fff;
+}
+
+.fh-giver {
+  transition: background 0.2s;
+}
+
+.fh-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 22px 14px;
+  border: 3px solid var(--ink);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 5px 5px 0 var(--ink);
+  text-align: center;
+}
+
+.fh-card strong {
+  font-size: clamp(2.6rem, 13vw, 4rem);
+  line-height: 0.9;
+  overflow-wrap: anywhere;
+}
+
+.fh-btns {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 10px;
+}
+
+.fh-got {
+  min-height: 86px;
+  font-size: 1.8rem;
+}
+
+.fh-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.fh-chip {
+  padding: 6px 10px;
+  border: 2.5px solid var(--ink);
+  border-radius: 10px;
+  background: #fff;
+  font-family: var(--font-game);
+}
+
+.fh-chip.ok {
+  background: #b8f0cf;
+}
+
+.fh-chip.skip {
+  background: #eee;
+  text-decoration: line-through;
+  opacity: 0.7;
+}

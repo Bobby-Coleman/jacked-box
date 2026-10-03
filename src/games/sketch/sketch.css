@@ -1,0 +1,106 @@
+/* SKETCHY — sketchbook. Off-white paper with blue grid, pencil-ink text, tomato accent. */
+.theme-sketch {
+  --grid: rgba(47, 123, 255, 0.13);
+  background-color: #f4f1e8;
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: #1d1611;
+}
+
+.sk-prompt {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  background: #ffe9a8;
+  box-shadow: var(--shadow-sm);
+  transform: rotate(-1deg);
+}
+
+.sk-prompt strong {
+  font-size: 1.5rem;
+  line-height: 1.1;
+}
+
+.sk-art {
+  position: relative;
+  width: min(100%, 420px);
+  align-self: center;
+}
+
+.sk-art.small {
+  width: min(72%, 300px);
+}
+
+.sk-artist {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  padding: 3px 8px 3px 3px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid var(--ink);
+  font-size: 0.8rem;
+}
+
+.sk-warn {
+  background: #ffe1dc;
+  font-weight: 700;
+}
+
+.sk-opt {
+  appearance: none;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 54px;
+  padding: 10px 14px;
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+  font-family: var(--font-game);
+  font-size: 1.15rem;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.sk-opt.on {
+  background: #ffc928;
+}
+
+.sk-opt.own {
+  opacity: 0.55;
+}
+
+.sk-rev {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 3px 3px 0 var(--ink);
+}
+
+.sk-rev.truth {
+  background: #d9f7e5;
+  box-shadow: 0 0 0 4px #19b66a, 3px 3px 0 var(--ink);
+}
+
+.sk-rev-text {
+  font-family: var(--font-game);
+  font-size: 1.2rem;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+

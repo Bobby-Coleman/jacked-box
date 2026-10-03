@@ -1,0 +1,27 @@
+{
+  "name": "jacked-box",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Phone-only party games. No TV, no console, just phones.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview --host",
+    "sim": "node scripts/sim.mjs",
+    "nettest": "node scripts/nettest.mjs",
+    "voice": "cd tools && npm install && node gen-voice.mjs",
+    "icons": "cd tools && npm install && node make-icons.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/bricolage-grotesque": "^5.3.0",
+    "@fontsource/big-shoulders-stencil-display": "^5.3.0",
+    "@fontsource/lilita-one": "^5.3.0",
+    "preact": "^10.27.0",
+    "qrcode-generator": "^2.0.4"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.10.6",
+    "vite": "^8.3.2"
+  }
+}

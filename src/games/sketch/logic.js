@@ -88,6 +88,11 @@ function reveal(ctx, g) {
     }
   }
   c.pts = pts;
+  g.liked = g.liked || {};
+  for (const [oid, ids] of Object.entries(c.likes || {})) {
+    const o = c.opts.find((x) => x.id === oid);
+    if (o) for (const author of o.by) g.liked[author] = (g.liked[author] || 0) + ids.length;
+  }
   // Reveal lies (picked ones first), truth last.
   const lies = c.opts.filter((o) => o.id !== 'T');
   const pickedCount = (o) => Object.values(c.picks).filter((v) => v === o.id).length;
@@ -106,6 +111,9 @@ function awards(g) {
   if (s[liar].fooled) out.push({ pid: liar, title: 'Master of lies', detail: `Fooled people ${s[liar].fooled} time${s[liar].fooled > 1 ? 's' : ''}` });
   const art = ids.slice().sort((a, b) => s[b].art - s[a].art)[0];
   if (s[art].art) out.push({ pid: art, title: 'Actually good artist', detail: `${s[art].art} correct guess${s[art].art > 1 ? 'es' : ''} on their art` });
+  const liked = g.liked || {};
+  const fun = Object.keys(liked).sort((a, b) => liked[b] - liked[a])[0];
+  if (fun && liked[fun]) out.push({ pid: fun, title: 'Funniest lies', detail: `${liked[fun]} heart${liked[fun] > 1 ? 's' : ''} from the room` });
   return out;
 }
 

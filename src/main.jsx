@@ -6,6 +6,7 @@ import './styles/base.css';
 import './styles/app.css';
 import { App } from './app/App.jsx';
 import { unlock } from './audio/audio.js';
+import { isNativeShell } from './platform.js';
 
 render(<App />, document.getElementById('app'));
 
@@ -23,7 +24,7 @@ window.addEventListener('pointerdown', firstTouch, { passive: true });
 window.addEventListener('keydown', firstTouch);
 
 // Offline-capable shell + faster reloads at parties with bad Wi-Fi.
-if ('serviceWorker' in navigator && import.meta.env.PROD) {
+if ('serviceWorker' in navigator && import.meta.env.PROD && !isNativeShell()) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
   });

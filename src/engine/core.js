@@ -175,7 +175,6 @@ export function makeCtx(s, now, io) {
     say(key, opts) {
       const list = LINES[key];
       if (!list || !list.length) return;
-      if (s.settings.voice === false && !(opts && opts.caption)) return;
       const i = Math.floor(Math.random() * list.length);
       pushCue(s, { k: key, i, t: list[i], at: now });
     },
@@ -208,7 +207,7 @@ export function makeCtx(s, now, io) {
         fresh = ok;
       }
       const chosen = ctx.shuffle(fresh).slice(0, n);
-      s.used[pool] = (s.used[pool] || []).concat(chosen.map((c) => c.idx)).slice(-300);
+      s.used[pool] = (s.used[pool] || []).concat(chosen.map((c) => c.idx)).slice(-150);
       return chosen.map((c) => c.it);
     },
     content(it) {

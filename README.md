@@ -61,6 +61,8 @@ Add `?dev=1` to the URL to get an **Add test bot** button in the lobby (the host
 
 ## Turning it into an Android / iPhone app
 
+**Android test build, no setup:** open the repo's **Actions** tab → **Android APK (debug)** → **Run workflow**. When it finishes, download `jacked-box-debug-apk` from the run and install the APK on an Android phone (allow "install unknown apps"). The workflow wraps the web build in Capacitor and builds it on GitHub's machines.
+
 The site is a self-contained static bundle with relative paths, bundled fonts, and no server routes, so it drops straight into [Capacitor](https://capacitorjs.com/):
 
 ```bash
@@ -71,7 +73,7 @@ npx cap add ios          # needs a Mac with Xcode
 npx cap sync
 ```
 
-`capacitor.config.json` is already set up (`webDir: dist`). Device features go through `src/platform.js` (haptics, keep-awake, share, storage), which is the one file to point at native plugins (`@capacitor/haptics`, `@capacitor-community/keep-awake`, `@capacitor/share`). Store icon: `public/icon-store-1024.png`.
+`capacitor.config.json` is already set up (`webDir: dist`). Inside the app, invite links and QR codes point at the public website (`PUBLIC_URL` in `src/platform.js`), so friends without the app can still join from a browser. Device features go through `src/platform.js` (haptics, keep-awake, share, storage), which is the one file to point at native plugins (`@capacitor/haptics`, `@capacitor-community/keep-awake`, `@capacitor/share`). Store icon: `public/icon-store-1024.png`.
 
 ## Voice
 

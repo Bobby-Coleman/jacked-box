@@ -63,9 +63,12 @@
 }
 
 .fh-word-wrap.rot {
-  transform: rotate(90deg);
-  width: 80dvh;
-  max-width: 80dvh;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 78dvh;
+  max-width: 78dvh;
+  transform: translate(-50%, -50%) rotate(90deg);
 }
 
 .fh-word {

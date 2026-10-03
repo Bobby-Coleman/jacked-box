@@ -134,3 +134,44 @@ export function joinUrl(code) {
   u.searchParams.set('r', code);
   return u.toString();
 }
+
+// ---------- install as an app (PWA) ----------
+let installEvent = null;
+const installSubs = new Set();
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    installEvent = e;
+    installSubs.forEach((fn) => fn());
+  });
+}
+
+export function isStandalone() {
+  try {
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  } catch (e) {
+    return false;
+  }
+}
+
+export function isIOS() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+
+export function canInstall() {
+  return !!installEvent;
+}
+
+export function onInstallable(fn) {
+  installSubs.add(fn);
+  return () => installSubs.delete(fn);
+}
+
+export async function promptInstall() {
+  if (!installEvent) return false;
+  installEvent.prompt();
+  const choice = await installEvent.userChoice.catch(() => null);
+  installEvent = null;
+  installSubs.forEach((fn) => fn());
+  return !!(choice && choice.outcome === 'accepted');
+}

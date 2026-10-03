@@ -6,6 +6,8 @@ import { unlock } from '../audio/audio.js';
 import { sfx } from '../audio/sfx.js';
 import { cleanName } from '../engine/core.js';
 import { GAME_META } from '../games/meta.jsx';
+import { canInstall, onInstallable, promptInstall, isStandalone, isIOS, isNativeShell } from '../platform.js';
+import { useEffect } from 'preact/hooks';
 
 const PREVIEW_COLOR = '#ff4d3d';
 
@@ -148,6 +150,8 @@ export function Home() {
         ))}
       </div>
 
+      <InstallHint />
+
       <div class="row wrap" style={{ justifyContent: 'center', gap: 8 }}>
         <button class="btn ghost sm" onClick={() => setScreenMode(!screenMode)}>
           {screenMode ? 'Play on this phone instead' : 'Use as table screen'}
@@ -170,6 +174,36 @@ export function Home() {
       {about && <About onClose={() => setAbout(false)} />}
     </div>
   );
+}
+
+// Offer "install as an app" where the browser supports it; a short tip on iPhone.
+function InstallHint() {
+  const [, bump] = useState(0);
+  useEffect(() => onInstallable(() => bump((v) => v + 1)), []);
+  if (isNativeShell() || isStandalone()) return null;
+  if (canInstall()) {
+    return (
+      <button
+        class="btn sm blue"
+        style={{ alignSelf: 'center' }}
+        onClick={async () => {
+          sfx('pop');
+          await promptInstall();
+          bump((v) => v + 1);
+        }}
+      >
+        Install Jacked Box on this phone
+      </button>
+    );
+  }
+  if (isIOS()) {
+    return (
+      <p class="small muted center-text" style={{ margin: 0 }}>
+        Tip: in Safari tap <strong>Share</strong>, then <strong>Add to Home Screen</strong> to keep Jacked Box like an app.
+      </p>
+    );
+  }
+  return null;
 }
 
 const PART_LABELS = { e: 'Eyes', m: 'Mouth', h: 'Headwear', b: 'Box' };

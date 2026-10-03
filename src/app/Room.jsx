@@ -392,7 +392,7 @@ function AudioDirector({ s, meId }) {
     for (const c of cues) {
       if (c.n <= lastCue.current) continue;
       lastCue.current = c.n;
-      if (c.k && !s.settings.voice) continue;
+      if (!s.settings.voice) continue;
       if (hostNow - c.at > 12000) continue;
       playCue(c);
     }

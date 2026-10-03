@@ -110,6 +110,11 @@ function reveal(ctx, g) {
     }
   }
   q.pts = pts;
+  g.liked = g.liked || {};
+  for (const [oid, ids] of Object.entries(q.likes || {})) {
+    const o = q.opts.find((x) => x.id === oid);
+    if (o) for (const author of o.by) g.liked[author] = (g.liked[author] || 0) + ids.length;
+  }
   const pickedCount = (o) => Object.values(q.picks).filter((v) => v === o.id).length;
   const lies = q.opts.filter((o) => o.id !== 'T' && pickedCount(o) > 0);
   lies.sort((a, b) => pickedCount(a) - pickedCount(b));
@@ -127,6 +132,9 @@ function awards(g) {
   if (liar && s[liar].fooled) out.push({ pid: liar, title: 'Most convincing liar', detail: `Fooled people ${s[liar].fooled} times` });
   const det = ids.slice().sort((a, b) => s[b].found - s[a].found)[0];
   if (det && s[det].found) out.push({ pid: det, title: 'Lie detector', detail: `Found the truth ${s[det].found} times` });
+  const liked = g.liked || {};
+  const fun = Object.keys(liked).sort((a, b) => liked[b] - liked[a])[0];
+  if (fun && liked[fun]) out.push({ pid: fun, title: 'Funniest lies', detail: `${liked[fun]} heart${liked[fun] > 1 ? 's' : ''} from the room` });
   return out;
 }
 

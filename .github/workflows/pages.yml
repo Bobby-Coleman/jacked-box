@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy website (GitHub Pages)
 
 on:
   push:
@@ -13,6 +13,23 @@ permissions:
 concurrency:
   group: pages
   cancel-in-progress: true
+
+# Publishable settings come from repository variables (Settings -> Secrets and variables ->
+# Actions -> Variables). Unset ones are simply off (guest mode, no store links).
+env:
+  VITE_PUBLIC_URL: ${{ vars.VITE_PUBLIC_URL }}
+  VITE_SUPPORT_EMAIL: ${{ vars.VITE_SUPPORT_EMAIL }}
+  VITE_SUPPORT_URL: ${{ vars.VITE_SUPPORT_URL }}
+  VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+  VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
+  VITE_AUTH_APPLE: ${{ vars.VITE_AUTH_APPLE }}
+  VITE_AUTH_GOOGLE: ${{ vars.VITE_AUTH_GOOGLE }}
+  VITE_GOOGLE_WEB_CLIENT_ID: ${{ vars.VITE_GOOGLE_WEB_CLIENT_ID }}
+  VITE_GOOGLE_IOS_CLIENT_ID: ${{ vars.VITE_GOOGLE_IOS_CLIENT_ID }}
+  VITE_APP_STORE_URL: ${{ vars.VITE_APP_STORE_URL }}
+  VITE_PLAY_STORE_URL: ${{ vars.VITE_PLAY_STORE_URL }}
+  VITE_LIVE_VOICE: ${{ vars.VITE_LIVE_VOICE }}
+  VITE_EARLY_ACCESS: ${{ vars.VITE_EARLY_ACCESS }}
 
 jobs:
   build:

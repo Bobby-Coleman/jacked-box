@@ -1,5 +1,6 @@
 // Thin platform layer. Everything device-specific goes through here so a native
 // shell (Capacitor) can swap in plugins later: haptics, keep-awake, share, storage.
+import { APP } from './config.js';
 
 export function load(key) {
   try {
@@ -37,7 +38,22 @@ export function ssave(key, val) {
   }
 }
 
+// Native plugins load lazily, only inside the iOS/Android apps.
+const plugin = (load) => {
+  let p = null;
+  return () => (p = p || load().catch(() => null));
+};
+const haptics = plugin(() => import('@capacitor/haptics'));
+const awake = plugin(() => import('@capacitor-community/keep-awake'));
+const sharer = plugin(() => import('@capacitor/share'));
+const files = plugin(() => import('@capacitor/filesystem'));
+
 export function vibrate(pattern) {
+  if (isNativeShell()) {
+    const ms = Array.isArray(pattern) ? pattern[0] : pattern;
+    haptics().then((m) => m && m.Haptics.impact({ style: ms >= 40 ? 'MEDIUM' : 'LIGHT' }).catch(() => {}));
+    return;
+  }
   try {
     if (navigator.vibrate) navigator.vibrate(pattern);
   } catch (e) {
@@ -65,6 +81,10 @@ async function requestWake() {
 
 export function keepAwake(on) {
   wantAwake = on;
+  if (isNativeShell()) {
+    awake().then((m) => m && (on ? m.KeepAwake.keepAwake() : m.KeepAwake.allowSleep()).catch(() => {}));
+    return;
+  }
   if (on) requestWake();
   else if (wakeLock) {
     wakeLock.release().catch(() => {});
@@ -79,9 +99,20 @@ if (typeof document !== 'undefined') {
 }
 
 export async function shareLink(url, text) {
+  if (isNativeShell()) {
+    const m = await sharer();
+    if (m) {
+      try {
+        await m.Share.share({ title: 'RiffRaff', text, url, dialogTitle: 'Invite friends' });
+        return 'shared';
+      } catch (e) {
+        return 'cancelled';
+      }
+    }
+  }
   try {
     if (navigator.share) {
-      await navigator.share({ title: 'Jacked Box', text, url });
+      await navigator.share({ title: 'RiffRaff', text, url });
       return 'shared';
     }
   } catch (e) {
@@ -113,7 +144,23 @@ export async function copyText(text) {
 
 // Public web address of the game. Invites must always point here, because inside a
 // native shell (Capacitor) the page's own origin is something like capacitor://localhost.
-export const PUBLIC_URL = 'https://bobby-coleman.github.io/jacked-box/';
+export const PUBLIC_URL = APP.url;
+
+// 'ios' | 'android' | 'web'
+export function platformName() {
+  const cap = typeof window !== 'undefined' && window.Capacitor;
+  if (cap && typeof cap.getPlatform === 'function') return cap.getPlatform();
+  return 'web';
+}
+
+export function openExternal(url) {
+  if (!url) return;
+  if (isNativeShell()) {
+    import('@capacitor/browser')
+      .then(({ Browser }) => Browser.open({ url }))
+      .catch(() => window.open(url, '_blank'));
+  } else window.open(url, '_blank', 'noopener');
+}
 
 export function isNativeShell() {
   const cap = typeof window !== 'undefined' && window.Capacitor;
@@ -137,12 +184,25 @@ export function joinUrl(code) {
 
 // Save an image: the phone's share sheet (save to photos, send to the group chat),
 // falling back to a download link on desktop browsers.
-export async function saveImage(dataUrl, filename = 'jacked-box.png') {
+export async function saveImage(dataUrl, filename = 'riffraff.png') {
+  // In the apps: write the image to the cache and hand it to the share sheet (save, send, post).
+  if (isNativeShell()) {
+    const [fsm, sm] = await Promise.all([files(), sharer()]);
+    if (fsm && sm) {
+      try {
+        const { uri } = await fsm.Filesystem.writeFile({ path: filename, data: dataUrl.split(',')[1], directory: fsm.Directory.Cache });
+        await sm.Share.share({ title: 'RiffRaff', files: [uri] });
+        return 'shared';
+      } catch (e) {
+        return 'cancelled';
+      }
+    }
+  }
   try {
     const blob = await (await fetch(dataUrl)).blob();
     const file = new File([blob], filename, { type: blob.type || 'image/png' });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: 'Jacked Box' });
+      await navigator.share({ files: [file], title: 'RiffRaff' });
       return 'shared';
     }
   } catch (e) {

@@ -1,8 +1,12 @@
-# Jacked Box
+# RiffRaff
 
-Party games for a room full of phones. No TV, no console, no app to install: one person starts a party, everyone else joins with a 4-letter code, and every phone is both the controller and the screen.
+Party games for a room full of phones. No TV, no console: one person starts a party, everyone else joins with a 4-letter code (in the iOS/Android app or the website), and every phone is both the controller and the screen. Ready? It's go time.
 
 **Play:** https://bobby-coleman.github.io/jacked-box/
+
+## Free and Premium
+
+The five classic Jackbox-style games (Zinger Ring, Fib Factory, Sketchy, Telephoney, Dead Lift) are free for everyone. **RiffRaff Premium** (a subscription in the apps) unlocks the other 15, including every face game. **One Premium player unlocks Premium games for the whole room**, so friends always play free. Nobody needs an account to join a party; signing in (email code, Apple or Google) just keeps your profile and Premium on all your devices. The catalog lives in `src/games/catalog.js`.
 
 ## The games
 
@@ -83,23 +87,17 @@ npm run sim          # plays every game start to finish with bots at every playe
 npm run build        # static site in dist/
 ```
 
-Add `?dev=1` to the URL to get an **Add test bot** button in the lobby (the host phone plays for the bots).
+The lobby offers **practice bots** while a party is small (the host phone plays for them), so you can try any game alone. `?dev=1` also shows a **Test Premium** switch in the Account screen. Copy `.env.example` to `.env` to try accounts and subscriptions locally.
 
-## Turning it into an Android / iPhone app
+## The iOS and Android apps
 
-**Android test build, no setup:** open the repo's **Actions** tab → **Android APK (debug)** → **Run workflow**. When it finishes, download `jacked-box-debug-apk` from the run and install the APK on an Android phone (allow "install unknown apps"). The workflow wraps the web build in Capacitor and builds it on GitHub's machines.
+The native apps are real Xcode and Android Studio projects in `ios/` and `android/` (Capacitor 8), wrapping the same web build, with native plugins for subscriptions (RevenueCat), sign-in (Apple, Google), haptics, keep-awake, sharing and the Android back button. App ID: `com.riffraff.party`.
 
-The site is a self-contained static bundle with relative paths, bundled fonts, and no server routes, so it drops straight into [Capacitor](https://capacitorjs.com/):
+- **Android:** builds locally (`cd android && ./gradlew bundleRelease`, Android SDK + JDK 21) or with the **Android app** workflow, which signs with the upload key from repository secrets and can upload to the Play Console.
+- **iOS:** builds with the **iOS app** workflow on GitHub's Macs: a compile check without Apple credentials, and a signed TestFlight upload once the App Store Connect key is added.
+- After changing web code: `npm run build && npx cap sync`.
 
-```bash
-npm install @capacitor/core @capacitor/cli @capacitor/android @capacitor/ios
-npm run build
-npx cap add android      # needs Android Studio
-npx cap add ios          # needs a Mac with Xcode
-npx cap sync
-```
-
-`capacitor.config.json` is already set up (`webDir: dist`). The face games use the front camera: the Android workflow adds the `CAMERA` permission automatically; for iOS, add `NSCameraUsageDescription` (e.g. "Take a selfie to star in face games") to `ios/App/App/Info.plist`. Without camera access, players can still pick a photo. Inside the app, invite links and QR codes point at the public website (`PUBLIC_URL` in `src/platform.js`), so friends without the app can still join from a browser. Device features go through `src/platform.js` (haptics, keep-awake, share, storage), which is the one file to point at native plugins (`@capacitor/haptics`, `@capacitor-community/keep-awake`, `@capacitor/share`). Store icon: `public/icon-store-1024.png`.
+**Store launch checklist** (accounts, subscriptions, signing, listings): [docs/LAUNCH.md](docs/LAUNCH.md).
 
 ## Voice
 

@@ -1,5 +1,5 @@
 {
-  "name": "jacked-box-tools",
+  "name": "riffraff-tools",
   "private": true,
   "type": "module",
   "description": "Offline asset tools: voice rendering (Chatterbox-Turbo via tools/tts, MIT) and icon rendering. Not needed to run or build the game.",

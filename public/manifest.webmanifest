@@ -1,6 +1,6 @@
 {
-  "name": "Jacked Box",
-  "short_name": "Jacked Box",
+  "name": "RiffRaff: Party Games",
+  "short_name": "RiffRaff",
   "description": "Party games for a room full of phones. No TV needed.",
   "start_url": "./",
   "scope": "./",

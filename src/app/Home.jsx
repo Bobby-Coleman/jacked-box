@@ -9,6 +9,9 @@ import { cleanName } from '../engine/core.js';
 import { GAME_META } from '../games/meta.jsx';
 import { canInstall, onInstallable, promptInstall, isStandalone, isIOS, isNativeShell } from '../platform.js';
 import { useEffect } from 'preact/hooks';
+import { useAccount, Paywall } from '../account/Paywall.jsx';
+import { AccountSheet } from '../account/AccountSheet.jsx';
+import { isPremiumGame } from '../games/catalog.js';
 
 const PREVIEW_COLOR = '#ff4d3d';
 
@@ -22,6 +25,9 @@ export function Home() {
   const [editing, setEditing] = useState(false);
   const [screenMode, setScreenMode] = useState(false);
   const [about, setAbout] = useState(false);
+  const [acctOpen, setAcctOpen] = useState(false);
+  const [paywall, setPaywall] = useState(false);
+  const acct = useAccount();
   const last = lastRoom();
   const invited = cleanCode(params.get('r') || '').length === 4;
 
@@ -51,15 +57,23 @@ export function Home() {
 
   return (
     <div class="screen home">
+      <div class="home-top">
+        <button class={'premium-chip' + (acct.premium ? ' on' : '')} onClick={() => (acct.premium ? setAcctOpen(true) : setPaywall(true))}>
+          <Icon name="star" size={16} /> {acct.premium ? 'Premium' : 'Get Premium'}
+        </button>
+        <button class="icon-btn" aria-label="Account and settings" onClick={() => setAcctOpen(true)}>
+          <Icon name="user" />
+        </button>
+      </div>
       <header class="home-hero">
         <div class="hero-mascot">
           <Boxter size={128} />
         </div>
         <h1 class="logo stencil">
-          <span>Jacked</span>
-          <span>Box</span>
+          <span>Riff</span>
+          <span>Raff</span>
         </h1>
-        <p class="hero-sub">Party games for a room full of phones. No TV, no console, no app to install.</p>
+        <p class="hero-sub">Party games for a room full of phones. No TV, no console. Ready? It's go time.</p>
       </header>
 
       {st.error && (
@@ -146,6 +160,7 @@ export function Home() {
       <div class="home-games" aria-label="Games in the box">
         {Object.values(GAME_META).map((m) => (
           <span class="mini-game" style={{ background: m.bg, color: m.fg }} key={m.id}>
+            {!acct.premium && isPremiumGame(m.id) && <Icon name="lock" size={12} stroke={3} />}
             {m.name}
           </span>
         ))}
@@ -173,6 +188,25 @@ export function Home() {
         />
       )}
       {about && <About onClose={() => setAbout(false)} />}
+      {acctOpen && (
+        <AccountSheet
+          profile={{ name: cleanName(name), av, face: myFace() }}
+          onClose={() => setAcctOpen(false)}
+          onPremium={() => {
+            setAcctOpen(false);
+            setPaywall(true);
+          }}
+        />
+      )}
+      {paywall && (
+        <Paywall
+          onClose={() => setPaywall(false)}
+          onSignIn={() => {
+            setPaywall(false);
+            setAcctOpen(true);
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -193,14 +227,14 @@ function InstallHint() {
           bump((v) => v + 1);
         }}
       >
-        Install Jacked Box on this phone
+        Install RiffRaff on this phone
       </button>
     );
   }
   if (isIOS()) {
     return (
       <p class="small muted center-text" style={{ margin: 0 }}>
-        Tip: in Safari tap <strong>Share</strong>, then <strong>Add to Home Screen</strong> to keep Jacked Box like an app.
+        Tip: in Safari tap <strong>Share</strong>, then <strong>Add to Home Screen</strong> to keep RiffRaff like an app.
       </p>
     );
   }
@@ -294,7 +328,7 @@ function About({ onClose }) {
           <strong>One person starts a party.</strong> Their phone shows a 4-letter room code and a QR code.
         </li>
         <li>
-          <strong>Everyone else joins</strong> on this website with the code. No app, no account.
+          <strong>Everyone else joins</strong> with the code, in the RiffRaff app or on the website. No account needed.
         </li>
         <li>
           <strong>Every phone is your screen.</strong> Prompts, drawings and reveals show up on all phones at once. One phone acts as the speaker for the host's voice and music.

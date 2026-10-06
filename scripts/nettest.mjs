@@ -18,7 +18,7 @@ const log = (...a) => console.log(`[${((Date.now() - t0) / 1000).toFixed(1)}s]`,
 
 const mk = (i) => ({ id: 'p_test' + i + Math.random().toString(36).slice(2, 6), name: 'Tester' + i, av: { b: i % 8, e: i % 12, m: i % 12, h: i % 14 } });
 
-const host = new RoomLink({ code, me: mk(0), engine });
+const host = new RoomLink({ code, me: { ...mk(0), premium: true }, engine });
 await host.create({});
 log(`room ${code} created; brokers up: ${host.netUp}`);
 

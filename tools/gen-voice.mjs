@@ -27,7 +27,7 @@ const ROOT = new URL('../', import.meta.url);
 const TTS = new URL('tts/', import.meta.url);
 const WAV = new URL('tts/wav/', import.meta.url);
 const OUT = new URL('../public/voice/', import.meta.url);
-const VOICE = 'chatterbox-turbo';
+const VOICE = process.argv[3] === 'wav-eleven' ? 'elevenlabs' : 'chatterbox-turbo';
 const step = process.argv[2] || 'all';
 
 // ---------- what to say ----------
@@ -170,6 +170,8 @@ function render() {
 }
 
 function encode() {
+  // `encode wav-eleven` encodes the ElevenLabs renders instead of the Chatterbox ones.
+  const WAV = new URL((process.argv[3] || 'wav') + '/', TTS);
   const jobs = buildJobs();
   const missing = jobs.filter((j) => !existsSync(new URL(j.id + '.wav', WAV)));
   if (missing.length) console.warn(`${missing.length} clips have no WAV yet (they'll use the device voice): ${missing.slice(0, 8).map((j) => j.id).join(', ')}${missing.length > 8 ? '…' : ''}`);

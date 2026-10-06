@@ -1,14 +1,36 @@
-name: Android APK (debug)
+name: Android app
 
-# Wraps the web build in a Capacitor Android shell and builds an installable debug APK.
-# Run it from the Actions tab ("Run workflow"); download the APK from the run's artifacts.
+# Builds the Android app from the committed native project (android/).
+#  - Every run: a signed release App Bundle (.aab, for Google Play) and APK (to sideload),
+#    when the upload key secrets are set; otherwise an unsigned debug APK.
+#  - With PLAY_SERVICE_ACCOUNT_JSON set: uploads the bundle to the Play Console internal track.
+# Secrets (Settings -> Secrets and variables -> Actions -> Secrets):
+#   RR_KEYSTORE_BASE64 (the .jks, base64), RR_KEYSTORE_PASSWORD, RR_KEY_ALIAS, RR_KEY_PASSWORD
+#   PLAY_SERVICE_ACCOUNT_JSON (optional)
 on:
   workflow_dispatch:
   push:
     tags: ['v*']
 
+env:
+  VITE_PUBLIC_URL: ${{ vars.VITE_PUBLIC_URL }}
+  VITE_SUPPORT_EMAIL: ${{ vars.VITE_SUPPORT_EMAIL }}
+  VITE_SUPPORT_URL: ${{ vars.VITE_SUPPORT_URL }}
+  VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+  VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
+  VITE_AUTH_APPLE: ${{ vars.VITE_AUTH_APPLE }}
+  VITE_AUTH_GOOGLE: ${{ vars.VITE_AUTH_GOOGLE }}
+  VITE_GOOGLE_WEB_CLIENT_ID: ${{ vars.VITE_GOOGLE_WEB_CLIENT_ID }}
+  VITE_GOOGLE_IOS_CLIENT_ID: ${{ vars.VITE_GOOGLE_IOS_CLIENT_ID }}
+  VITE_RC_IOS_KEY: ${{ vars.VITE_RC_IOS_KEY }}
+  VITE_RC_ANDROID_KEY: ${{ vars.VITE_RC_ANDROID_KEY }}
+  VITE_APP_STORE_URL: ${{ vars.VITE_APP_STORE_URL }}
+  VITE_PLAY_STORE_URL: ${{ vars.VITE_PLAY_STORE_URL }}
+  VITE_LIVE_VOICE: ${{ vars.VITE_LIVE_VOICE }}
+  VITE_EARLY_ACCESS: ${{ vars.VITE_EARLY_ACCESS }}
+
 jobs:
-  apk:
+  android:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,21 +44,47 @@ jobs:
           java-version: 21
       - run: npm ci --ignore-scripts
       - run: npx vite build
-      - name: Add Capacitor Android shell
+      - run: npx cap sync android
+      - name: Upload key
+        env:
+          KEYSTORE: ${{ secrets.RR_KEYSTORE_BASE64 }}
+          PLAY_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
         run: |
-          npm install --no-save @capacitor/core@8 @capacitor/cli@8 @capacitor/android@8
-          npx cap add android
-          # Live selfies (face games) use the camera through the WebView; it's optional hardware.
-          sed -i 's#<uses-permission android:name="android.permission.INTERNET" />#&<uses-permission android:name="android.permission.CAMERA" /><uses-feature android:name="android.hardware.camera" android:required="false" />#' android/app/src/main/AndroidManifest.xml
-          grep -n "CAMERA" android/app/src/main/AndroidManifest.xml
-          mkdir -p assets && cp public/icon-store-1024.png assets/icon-only.png
-          npx --yes @capacitor/assets@3 generate --android --iconBackgroundColor '#e23a2a' --splashBackgroundColor '#d9a466' || echo "icon generation skipped"
-          npx cap sync android
-      - name: Build debug APK
+          if [ -n "$PLAY_JSON" ]; then echo "HAS_PLAY=1" >> "$GITHUB_ENV"; fi
+          if [ -n "$KEYSTORE" ]; then
+            echo "$KEYSTORE" | base64 -d > "$RUNNER_TEMP/upload.jks"
+            echo "RR_KEYSTORE_FILE=$RUNNER_TEMP/upload.jks" >> "$GITHUB_ENV"
+          else
+            echo "No signing secrets: building a debug APK only."
+          fi
+      - name: Build
         working-directory: android
-        run: ./gradlew assembleDebug --no-daemon --stacktrace
+        env:
+          RR_KEYSTORE_PASSWORD: ${{ secrets.RR_KEYSTORE_PASSWORD }}
+          RR_KEY_ALIAS: ${{ secrets.RR_KEY_ALIAS }}
+          RR_KEY_PASSWORD: ${{ secrets.RR_KEY_PASSWORD }}
+          RR_VERSION_CODE: ${{ github.run_number }}
+        run: |
+          chmod +x gradlew
+          if [ -n "$RR_KEYSTORE_FILE" ]; then
+            ./gradlew bundleRelease assembleRelease --no-daemon --stacktrace
+          else
+            ./gradlew assembleDebug --no-daemon --stacktrace
+          fi
       - uses: actions/upload-artifact@v4
         with:
-          name: jacked-box-debug-apk
-          path: android/app/build/outputs/apk/debug/*.apk
+          name: riffraff-android
+          path: |
+            android/app/build/outputs/bundle/release/*.aab
+            android/app/build/outputs/apk/release/*.apk
+            android/app/build/outputs/apk/debug/*.apk
           retention-days: 30
+      - name: Upload to Google Play (internal testing)
+        if: ${{ env.RR_KEYSTORE_FILE != '' && env.HAS_PLAY == '1' }}
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.riffraff.party
+          releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
+          track: internal
+          status: completed

@@ -3,6 +3,7 @@
 // Usage: node scripts/sim.mjs [gameId] [runsPerCount]
 import { engine } from '../src/engine/core.js';
 import { GAMES, GAME_LIST } from '../src/games/logic.js';
+import { isPremiumGame } from '../src/games/catalog.js';
 
 const only = process.argv[2];
 const FACE = 'data:image/jpeg;base64,' + 'A'.repeat(400);
@@ -22,7 +23,7 @@ function simulate(gameId, n, opts = {}) {
     dropBlob: (id) => blobs.delete(id),
   };
   const ids = Array.from({ length: n }, (_, i) => 'p' + i);
-  const s = engine.createRoom({ code: 'TEST', me: { id: ids[0], name: 'Pat', av: {} }, settings: opts.settings || {}, now });
+  const s = engine.createRoom({ code: 'TEST', me: { id: ids[0], name: 'Pat', av: {}, premium: true }, settings: opts.settings || {}, now });
   for (const id of ids.slice(1)) engine.reduce(s, id, 'join', { name: 'Bot' + id }, now, io);
   // Face games: everyone has a selfie when the game needs them; otherwise a random few do.
   const faceN = mod.faceMin ? n : mod.faces ? Math.floor(Math.random() * (n + 1)) : 0;
@@ -72,6 +73,24 @@ function simulate(gameId, n, opts = {}) {
 }
 
 let failures = 0;
+
+// Premium gate: without a Premium player, only free games start.
+{
+  const now = 1_700_000_000_000;
+  const io = { blob: () => 'b', dropBlob() {} };
+  for (const mod of GAME_LIST) {
+    const s = engine.createRoom({ code: 'GATE', me: { id: 'h', name: 'Host', av: {} }, settings: {}, now });
+    for (let i = 1; i < Math.max(mod.min, 4); i++) engine.reduce(s, 'p' + i, 'join', { name: 'P' + i }, now, io);
+    if (mod.faceMin) for (const id of Object.keys(s.players)) engine.reduce(s, id, 'face', { img: FACE }, now, io);
+    engine.reduce(s, 'h', 'start', { id: mod.id }, now, io);
+    const started = s.scene === 'game';
+    if (started === isPremiumGame(mod.id)) {
+      failures++;
+      console.error(`FAIL premium gate: ${mod.id} ${started ? 'started without Premium' : 'free game did not start'}`);
+    }
+  }
+  if (!only) console.log(`premium gate ok: ${GAME_LIST.filter((m) => !isPremiumGame(m.id)).map((m) => m.id).join(', ')} are free`);
+}
 for (const mod of GAME_LIST) {
   if (only && mod.id !== only) continue;
   const counts = [];

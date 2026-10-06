@@ -15,7 +15,7 @@
 import { PubSub } from './pubsub.js';
 import { roomKeys, makeCodec } from './seal.js';
 
-export const NS = 'jackedbox/r2';
+export const NS = 'riffraff/r1';
 const HOST_TIMEOUT = 6500;
 const HB_MS = 2000;
 const PING_MS = 2500;
@@ -113,7 +113,7 @@ export class RoomLink {
     if (Date.now() - (this.state.updated || 0) > 8 * 3600e3) throw new Error('expired');
     this.hostSeenAt = Date.now(); // grace period before any election
     const mine = this.state.players && this.state.players[this.me.id];
-    this.send('join', { name: this.me.name, av: this.me.av, screen: !!this.me.screen, rejoin: !!mine });
+    this.send('join', { name: this.me.name, av: this.me.av, screen: !!this.me.screen, premium: !!this.me.premium, rejoin: !!mine });
     this._emit();
   }
 

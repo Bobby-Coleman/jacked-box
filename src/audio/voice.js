@@ -4,6 +4,7 @@
 import { getCtx, buses, duck } from './audio.js';
 import { clipName, nameClips, nameFirst, lineSpoken } from './clipname.js';
 import { LINES } from '../content/voice.js';
+import { liveClipUrl } from './live.js';
 
 let manifest = null; // Set of available clip names
 let manifestVer = '1';
@@ -35,14 +36,18 @@ function loadManifest() {
 }
 
 async function getBuffer(name) {
-  if (bufCache.has(name)) return bufCache.get(name);
+  return fetchBuffer(name, base() + name + '.mp3?v=' + manifestVer);
+}
+
+async function fetchBuffer(key, url) {
+  if (bufCache.has(key)) return bufCache.get(key);
   const ac = getCtx();
   if (!ac) return null;
-  const p = fetch(base() + name + '.mp3?v=' + manifestVer)
+  const p = fetch(url)
     .then((r) => (r.ok ? r.arrayBuffer() : null))
     .then((ab) => (ab ? new Promise((res) => ac.decodeAudioData(ab, res, () => res(null))) : null))
     .catch(() => null);
-  bufCache.set(name, p);
+  bufCache.set(key, p);
   return p;
 }
 
@@ -192,6 +197,15 @@ async function pump() {
           played = true;
         }
       }
+      if (!played && cue.k == null) {
+        // Text players typed: the host's live voice in Premium rooms, when it's set up.
+        const url = await liveClipUrl(cue.tts || cue.t);
+        const buf = url ? await fetchBuffer('live:' + url, url) : null;
+        if (buf) {
+          await playBuffer(buf);
+          played = true;
+        }
+      }
       if (!played) await speak(cue.tts || cue.t);
     } catch (e) {
       /* keep going */
@@ -203,6 +217,8 @@ async function pump() {
 }
 
 export function playCue(cue) {
+  // A cut cue ("Ready? It's go time!") interrupts leftover narration, like rules the VIP skipped.
+  if (cue.cut) stopVoice();
   // Don't let a backlog build up: keep at most 3 waiting lines.
   if (queue.length > 2) queue.splice(0, queue.length - 2);
   queue.push(cue);

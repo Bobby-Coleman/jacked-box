@@ -6,7 +6,7 @@
 // implies; what this stops is passive snooping on the shared public brokers.
 const te = new TextEncoder();
 const td = new TextDecoder();
-const SALT = 'jackedbox-room-salt-v2';
+const SALT = 'riffraff-room-salt-v1';
 const ITERATIONS = 60000;
 
 function subtle() {

@@ -240,6 +240,28 @@ def audition(args):
     (out / "audition.json").write_text(json.dumps([dict(zip(["voice", "wer", "pitch", "expressive", "wps"], map(lambda v: v if isinstance(v, str) else round(float(v), 3), r))) for r in rows], indent=1))
 
 
+def check_dir(args):
+    """Transcribe already-rendered WAVs (e.g. from ElevenLabs) and list the ones that don't match."""
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    jobs = {j["id"]: j for j in json.loads(Path(args.jobs).read_text(encoding="utf-8"))}
+    checker = Checker(device)
+    bad = {}
+    files = sorted(Path(args.check).glob("*.wav"))
+    for n, f in enumerate(files, 1):
+        job = jobs.get(f.stem)
+        if not job:
+            continue
+        y, sr = sf.read(f, dtype="float32")
+        ok, score, hyp, dur = checker.judge(trim(y, sr), sr, job)
+        if not ok:
+            bad[f.stem] = {"text": job["text"], "heard": hyp, "score": round(score, 3), "seconds": round(dur, 2)}
+        if n % 100 == 0:
+            print(f"{n}/{len(files)} checked, {len(bad)} flagged", flush=True)
+    out = Path(args.check).parent / "qa-eleven.json"
+    out.write_text(json.dumps(bad, indent=1), encoding="utf-8")
+    print(f"{len(files)} checked, {len(bad)} flagged -> {out.name}", flush=True)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--jobs", default=str(HERE / "jobs.json"))
@@ -253,8 +275,11 @@ def main():
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--no-qa", action="store_true")
     ap.add_argument("--audition", action="store_true")
+    ap.add_argument("--check", help="folder of rendered WAVs to verify with Whisper")
     args = ap.parse_args()
-    if args.audition:
+    if args.check:
+        check_dir(args)
+    elif args.audition:
         audition(args)
     else:
         render_jobs(args)

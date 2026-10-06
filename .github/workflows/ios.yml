@@ -1,0 +1,91 @@
+name: iOS app
+
+# Builds the iOS app on a GitHub-hosted Mac (Xcode only runs on macOS).
+#  - Without Apple secrets: a compile check for the simulator (no signing needed).
+#  - With them: archives with automatic signing and uploads the build to TestFlight.
+# Secrets (Settings -> Secrets and variables -> Actions -> Secrets), from App Store Connect ->
+# Users and Access -> Integrations -> App Store Connect API (role: App Manager):
+#   ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_P8 (the .p8 file's contents), APPLE_TEAM_ID
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+env:
+  VITE_PUBLIC_URL: ${{ vars.VITE_PUBLIC_URL }}
+  VITE_SUPPORT_EMAIL: ${{ vars.VITE_SUPPORT_EMAIL }}
+  VITE_SUPPORT_URL: ${{ vars.VITE_SUPPORT_URL }}
+  VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+  VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
+  VITE_AUTH_APPLE: ${{ vars.VITE_AUTH_APPLE }}
+  VITE_AUTH_GOOGLE: ${{ vars.VITE_AUTH_GOOGLE }}
+  VITE_GOOGLE_WEB_CLIENT_ID: ${{ vars.VITE_GOOGLE_WEB_CLIENT_ID }}
+  VITE_GOOGLE_IOS_CLIENT_ID: ${{ vars.VITE_GOOGLE_IOS_CLIENT_ID }}
+  VITE_RC_IOS_KEY: ${{ vars.VITE_RC_IOS_KEY }}
+  VITE_RC_ANDROID_KEY: ${{ vars.VITE_RC_ANDROID_KEY }}
+  VITE_APP_STORE_URL: ${{ vars.VITE_APP_STORE_URL }}
+  VITE_PLAY_STORE_URL: ${{ vars.VITE_PLAY_STORE_URL }}
+  VITE_LIVE_VOICE: ${{ vars.VITE_LIVE_VOICE }}
+  VITE_EARLY_ACCESS: ${{ vars.VITE_EARLY_ACCESS }}
+
+jobs:
+  ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npx vite build
+      - run: npx cap sync ios
+      - name: Xcode
+        run: |
+          sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | sort -V | tail -1)"
+          xcodebuild -version
+      - name: Signing setup
+        env:
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          if [ -n "$ASC_KEY_P8" ] && [ -n "$ASC_KEY_ID" ] && [ -n "$ASC_ISSUER_ID" ] && [ -n "$APPLE_TEAM_ID" ]; then
+            mkdir -p "$RUNNER_TEMP/keys"
+            printf '%s' "$ASC_KEY_P8" > "$RUNNER_TEMP/keys/AuthKey_$ASC_KEY_ID.p8"
+            echo "SIGN=1" >> "$GITHUB_ENV"
+          else
+            echo "No App Store Connect secrets: compile check only."
+          fi
+      - name: Compile check (simulator, unsigned)
+        if: ${{ env.SIGN != '1' }}
+        run: |
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO build | tail -30
+      - name: Archive and upload to TestFlight
+        if: ${{ env.SIGN == '1' }}
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          AUTH="-allowProvisioningUpdates -authenticationKeyPath $RUNNER_TEMP/keys/AuthKey_$ASC_KEY_ID.p8 -authenticationKeyID $ASC_KEY_ID -authenticationKeyIssuerID $ASC_ISSUER_ID"
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release \
+            -destination 'generic/platform=iOS' -archivePath "$RUNNER_TEMP/RiffRaff.xcarchive" \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" CODE_SIGN_STYLE=Automatic CURRENT_PROJECT_VERSION=${{ github.run_number }} \
+            $AUTH archive | tail -30
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>upload</string>
+            <key>teamID</key><string>$APPLE_TEAM_ID</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>manageAppVersionAndBuildNumber</key><false/>
+          </dict></plist>
+          PLIST
+          xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/RiffRaff.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" -exportPath "$RUNNER_TEMP/export" $AUTH | tail -30

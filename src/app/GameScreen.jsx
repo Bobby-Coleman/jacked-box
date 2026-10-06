@@ -1,4 +1,6 @@
-import { useStore, Timer, send } from '../ui/common.jsx';
+import { useEffect } from 'preact/hooks';
+import { useStore, Timer, send, useNow } from '../ui/common.jsx';
+import { vibrate } from '../platform.js';
 import { GAMES } from '../games/logic.js';
 import { GAME_META, GameGlyph } from '../games/meta.jsx';
 import { VIEWS } from '../games/views.js';
@@ -25,6 +27,25 @@ export function GameScreen() {
       ) : (
         <div class="screen">Unknown game.</div>
       )}
+      {g.go && g.phase !== 'intro' && <GoSplash at={g.go} link={link} />}
+    </div>
+  );
+}
+
+// "Ready? It's go time!" splash, shown on every phone the moment a game starts.
+const GO_MS = 2100;
+function GoSplash({ at, link }) {
+  const t = useNow(100);
+  const hostNow = link.now ? link.now() : t;
+  const showing = hostNow - at < GO_MS;
+  useEffect(() => {
+    if (showing) vibrate(40);
+  }, [at]);
+  if (!showing) return null;
+  return (
+    <div class="go-splash" aria-live="assertive">
+      <span class="go-ready">Ready?</span>
+      <span class="go-line stencil">It's go time!</span>
     </div>
   );
 }

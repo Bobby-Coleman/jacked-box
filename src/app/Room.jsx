@@ -145,7 +145,7 @@ function ShareSheet({ code, onClose }) {
         <button
           class="btn primary"
           onClick={async () => {
-            const r = await shareLink(url, `Join my Jacked Box party! Room code ${code}`);
+            const r = await shareLink(url, `Join my RiffRaff party! Room code ${code}`);
             if (r === 'copied') toast('Link copied');
           }}
         >

@@ -4,7 +4,7 @@
 // if a file is missing the speaker phone falls back to its built-in voice.
 export const LINES = {
   'room.welcome': [
-    "Welcome to Jacked Box! I'm Boxter. Get your friends in here. The code is on your screen.",
+    "Welcome to RiffRaff! I'm Boxter, your host. Get your friends in here. The code is on your screen.",
     "Boxter here, fully pumped. Tell your friends the room code and let's get this party lifted.",
   ],
   'room.pick': [
@@ -24,6 +24,8 @@ export const LINES = {
   'gen.hurry': ['Ten seconds left!', 'Ten seconds! Hurry it up!', 'Clock is ticking. Ten seconds!'],
   'gen.timeup': ["Time's up!", 'Pencils down! Phones down! Everything down!'],
   'gen.scores': ["Let's check the scoreboard.", "Here's how everybody's doing."],
+  // Said the moment a game starts, after the rules.
+  'gen.go': ["Ready? It's go time!"],
   'gen.lastround': ['Last round! Make it count.', 'Final round. Leave it all on the mat.'],
 
   // Zinger Ring

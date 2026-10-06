@@ -1,7 +1,7 @@
-// Jacked Box service worker: network-first for pages and data, cache-first for
+// RiffRaff service worker: network-first for pages and data, cache-first for
 // hashed build assets and voice clips. Multiplayer always needs the network;
 // this just makes reloads instant on slow party Wi-Fi.
-const CACHE = 'jb-cache-v1';
+const CACHE = 'riffraff-cache-v1';
 
 self.addEventListener('install', () => self.skipWaiting());
 

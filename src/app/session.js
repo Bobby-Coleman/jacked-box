@@ -5,6 +5,7 @@ import { engine } from '../engine/core.js';
 import { load, save, sload, ssave, keepAwake } from '../platform.js';
 import { randomAvatar } from '../ui/Avatar.jsx';
 import { setBlobResolver } from '../ui/faceRegistry.js';
+import { account, onAccount, useProfileHooks, pushProfile } from '../account/account.js';
 
 // Consonants only: no accidental words, nothing that looks like 0/O or 1/I.
 const CODE_CHARS = 'BCDFGHJKLMNPQRSTVWXZ';
@@ -62,6 +63,7 @@ export function profile() {
     name: saved.name || '',
     av: saved.av || randomAvatar(),
     face: myFace(),
+    premium: !!account.premium,
   };
 }
 
@@ -89,9 +91,27 @@ if (import.meta.hot) import.meta.hot.accept(() => location.reload());
 export function saveProfile(p) {
   save('jb.me', { name: p.name, av: p.av });
   ssave('jb.me', { name: p.name, av: p.av });
-  if (store.link && store.link.state) store.link.send('profile', { name: p.name, av: p.av });
+  if (store.link && store.link.state) store.link.send('profile', { name: p.name, av: p.av, premium: !!account.premium });
+  pushProfile(p);
   emit();
 }
+
+// Signing in can bring a saved name and look from the account.
+useProfileHooks(
+  () => profile(),
+  (p) => saveProfile(p),
+);
+
+// Premium can start or end mid-party (a purchase, a sign-in): tell the room.
+let lastPremium = null;
+onAccount((a) => {
+  if (a.premium === lastPremium) return;
+  lastPremium = a.premium;
+  const link = store.link;
+  if (link) link.me.premium = !!a.premium;
+  if (link && link.state && link.state.players[link.me.id]) link.send('profile', { premium: !!a.premium });
+  emit();
+});
 
 export function lastRoom() {
   const l = load('jb.last');

@@ -1,0 +1,13 @@
+# Supabase project config for the CLI (https://supabase.com/docs/guides/cli).
+# Link it to your project with:  npx supabase link --project-ref <your-project-ref>
+project_id = "riffraff"
+
+[functions.delete-account]
+verify_jwt = true
+
+[functions.tts]
+verify_jwt = true
+
+# RevenueCat calls this with its own Authorization header (checked in the function).
+[functions.revenuecat-webhook]
+verify_jwt = false

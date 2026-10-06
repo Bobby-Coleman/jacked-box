@@ -1,4 +1,6 @@
-import { useEffect, useRef } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
+import { isPremiumGame, roomHasPremium, canPlay, FREE_GAMES } from '../games/catalog.js';
+import { Paywall } from '../account/Paywall.jsx';
 import { useStore, Icon, send, QR } from '../ui/common.jsx';
 import { PlayerAvatar } from '../ui/Avatar.jsx';
 import { GAME_LIST } from '../games/logic.js';
@@ -8,7 +10,8 @@ import { appUrl, joinUrl } from '../platform.js';
 import { avatarJpeg } from '../ui/faces.jsx';
 import { myFace } from './session.js';
 
-// Hidden test mode: add ?dev=1 to the URL to get bot players in the lobby.
+// Practice bots: the host phone plays for them. Offered while the party is small (try a game
+// solo, or while friends are on their way); ?dev=1 always shows them.
 const DEV = typeof location !== 'undefined' && new URLSearchParams(location.search).has('dev');
 
 export function Lobby({ onShare, onEditMe }) {
@@ -86,10 +89,11 @@ export function Lobby({ onShare, onEditMe }) {
 
       {s.played > 0 && <PartyStandings s={s} meId={meId} />}
 
-      {isVip && DEV && (
-        <div class="row" style={{ justifyContent: 'center' }}>
+      {isVip && (DEV || players.filter((p) => !p.bot).length < 3 || players.some((p) => p.bot)) && (
+        <div class="row wrap" style={{ justifyContent: 'center' }}>
+          {!players.some((p) => p.bot) && <span class="small center-text" style={{ width: '100%' }}>Waiting for friends? Try a game with practice bots.</span>}
           <button class="btn sm" onClick={() => send('addbot', {})}>
-            + Add test bot
+            + Practice bot
           </button>
           {players.some((p) => p.bot && !p.face) && (
             <button
@@ -246,9 +250,25 @@ function GamePicker({ s, active }) {
   const extra = GAME_LIST.filter((g) => !listed.has(g.id)).map((g) => g.id);
   const shelves = extra.length ? SHELVES.concat([{ title: 'More', ids: extra }]) : SHELVES;
   const faces = Object.values(s.players).filter((p) => !p.screen && p.on !== false && p.face).length;
+  const [paywall, setPaywall] = useState(null);
+  const premiumRoom = roomHasPremium(s);
+  const unlockers = Object.values(s.players).filter((p) => p.premium && !p.bot);
   return (
     <section class="col" aria-label="Pick a game">
       <span class="eyebrow">You're the VIP. Pick a game.</span>
+      <div class={'premium-banner' + (premiumRoom ? ' on' : '')}>
+        <Icon name="star" size={18} />
+        {premiumRoom ? (
+          <span>
+            <strong>Premium party:</strong> every game unlocked by {unlockers.map((p) => p.name).join(', ')}.
+          </span>
+        ) : (
+          <span>
+            The {FREE_GAMES.length} classics are free. <button class="linkish" onClick={() => setPaywall('Unlock every game for this party')}>Premium</button> unlocks {GAME_LIST.length - FREE_GAMES.length} more for everyone here.
+          </span>
+        )}
+      </div>
+      {paywall && <Paywall reason={paywall} onClose={() => setPaywall(null)} />}
       {shelves.map((sh) => (
         <div class="col" key={sh.title} style={{ gap: 10 }}>
           <h2 class="shelf-title stencil">{sh.title}</h2>
@@ -266,24 +286,36 @@ function GamePicker({ s, active }) {
                   <GameCard
                     id={mod.id}
                     active={active}
+                    locked={!canPlay(s, mod.id)}
                     selected={pick === mod.id}
                     onClick={() => {
                       sfx('tap');
                       send('pick', { id: pick === mod.id ? null : mod.id });
                     }}
                   />
-                  {pick === mod.id && (
-                    <button
-                      class="btn primary slide-in"
-                      disabled={active < mod.min || (mod.faceMin && faces < mod.faceMin)}
-                      onClick={() => {
-                        sfx('bell');
-                        send('start', { id: mod.id });
-                      }}
-                    >
-                      {startLabel(mod, active, faces)}
-                    </button>
-                  )}
+                  {pick === mod.id &&
+                    (canPlay(s, mod.id) ? (
+                      <button
+                        class="btn primary slide-in"
+                        disabled={active < mod.min || (mod.faceMin && faces < mod.faceMin)}
+                        onClick={() => {
+                          sfx('bell');
+                          send('start', { id: mod.id });
+                        }}
+                      >
+                        {startLabel(mod, active, faces)}
+                      </button>
+                    ) : (
+                      <button
+                        class="btn yellow slide-in"
+                        onClick={() => {
+                          sfx('pop');
+                          setPaywall(`Unlock ${mod.name} and every other game`);
+                        }}
+                      >
+                        <Icon name="lock" size={18} /> Unlock with Premium
+                      </button>
+                    ))}
                 </div>
               ))}
           </div>
@@ -293,7 +325,7 @@ function GamePicker({ s, active }) {
   );
 }
 
-export function GameCard({ id, active, selected, onClick }) {
+export function GameCard({ id, active, selected, onClick, locked }) {
   const mod = GAME_LIST.find((g) => g.id === id);
   const m = GAME_META[id];
   if (!mod || !m) return null;
@@ -310,6 +342,11 @@ export function GameCard({ id, active, selected, onClick }) {
       <span class="glyph-disc">
         <GameGlyph id={id} size={40} />
       </span>
+      {isPremiumGame(id) && (
+        <span class={'gc-premium' + (locked ? ' locked' : '')}>
+          <Icon name={locked ? 'lock' : 'star'} size={13} stroke={3} /> Premium
+        </span>
+      )}
       <span class="gc-body">
         <span class="gc-name stencil">{mod.name}</span>
         <span class="gc-tag">{mod.tagline}</span>

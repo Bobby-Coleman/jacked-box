@@ -3,6 +3,8 @@
 import { GAMES } from '../games/logic.js';
 import { LINES } from '../content/voice.js';
 import { lineSpoken } from '../audio/clipname.js';
+import { isPremiumGame, roomHasPremium } from '../games/catalog.js';
+import { maskInput, maskProfanity } from './filter.js';
 
 export const MAX_PLAYERS = 16;
 export const PLAYER_COLORS = [
@@ -82,7 +84,7 @@ function addPlayer(s, pid, info, now) {
     if (Object.keys(s.players).length >= MAX_PLAYERS) return false;
     p = s.players[pid] = {
       id: pid,
-      name: uniqueName(s, pid, cleanName(info.name) || 'PLAYER'),
+      name: uniqueName(s, pid, familyName(s, info.name) || 'PLAYER'),
       av: cleanAv(info.av),
       color: pickColor(s),
       joined: now,
@@ -90,6 +92,7 @@ function addPlayer(s, pid, info, now) {
       screen: !!info.screen,
     };
     if (info.bot) p.bot = true;
+    if (info.premium && !info.bot) p.premium = true;
     s.order.push(pid);
     if (!p.screen && !p.bot && (!s.vip || !s.players[s.vip])) s.vip = pid;
     // A table screen is the best speaker: it lies in the middle and stays awake.
@@ -97,12 +100,22 @@ function addPlayer(s, pid, info, now) {
   } else {
     // A rejoin (page reload, phone woke up) keeps the identity the room already knows.
     if (!info.rejoin) {
-      if (info.name) p.name = uniqueName(s, pid, cleanName(info.name) || p.name);
+      if (info.name) p.name = uniqueName(s, pid, familyName(s, info.name) || p.name);
       if (info.av) p.av = cleanAv(info.av);
+    }
+    // Premium can change mid-party (someone subscribes, or signs in on this phone).
+    if (info.premium !== undefined && !p.bot) {
+      if (info.premium) p.premium = true;
+      else delete p.premium;
     }
     p.on = true;
   }
   return true;
+}
+
+function familyName(s, name) {
+  const n = cleanName(name);
+  return s.settings && s.settings.spicy ? n : maskProfanity(n);
 }
 
 function removePlayer(s, pid, now, io) {
@@ -180,7 +193,10 @@ export function makeCtx(s, now, io) {
       const i = Math.floor(Math.random() * list.length);
       // Lines written for a name still work without one.
       const t = list[i].includes('{name}') ? lineSpoken(list[i]) : list[i];
-      pushCue(s, { k: key, i, t: caption(t), at: now });
+      const cue = { k: key, i, t: caption(t), at: now };
+      // cut: stop whatever the host is still saying (e.g. rules the VIP skipped).
+      if (opts && opts.cut) cue.cut = 1;
+      pushCue(s, cue);
     },
     // A host line with a player's name spliced in ({name} at the start or end of the line).
     sayName(key, pid) {
@@ -300,6 +316,8 @@ function startGame(s, id, now, io) {
   if (!mod) return;
   const pids = s.order.filter((x) => s.players[x] && !s.players[x].screen && s.players[x].on !== false);
   if (pids.length < mod.min) return;
+  // Premium games need one Premium player in the room.
+  if (isPremiumGame(id) && !roomHasPremium(s)) return;
   if (mod.faceMin && pids.slice(0, mod.max).filter((x) => s.players[x].face).length < mod.faceMin) return;
   for (const b of s.blobs || []) io && io.dropBlob(b);
   s.blobs = [];
@@ -310,7 +328,7 @@ function startGame(s, id, now, io) {
     aud: pids.slice(mod.max),
     phase: 'intro',
     t0: now,
-    until: now + 16000,
+    until: now + 18000,
     step: 0,
     round: 0,
     scores: Object.fromEntries(players.map((x) => [x, 0])),
@@ -338,7 +356,7 @@ export function reduce(s, pid, y, d, now, io) {
   const isVip = s.vip === pid;
   switch (y) {
     case 'profile':
-      addPlayer(s, pid, { name: d.name, av: d.av }, now);
+      addPlayer(s, pid, { name: d.name, av: d.av, premium: d.premium }, now);
       break;
     case 'leave':
       removePlayer(s, pid, now, io);
@@ -380,7 +398,7 @@ export function reduce(s, pid, y, d, now, io) {
         const mod = GAMES[g.id];
         const ctx = makeCtx(s, now, io);
         if (g.phase === 'intro') {
-          mod.begin(ctx, g);
+          letsGo(ctx, g, mod);
         } else if (mod.skip) mod.skip(ctx, g);
         else g.until = now;
       }
@@ -434,7 +452,8 @@ export function reduce(s, pid, y, d, now, io) {
       const inGame = g.pids.includes(pid);
       if (!inGame && !(mod.audience && mod.audience(g, d))) break;
       if (d.step !== undefined && d.step !== g.step && !(mod.anyStep && mod.anyStep(d))) break;
-      mod.input(makeCtx(s, now, io), g, pid, d);
+      // Family mode masks profanity in everything players type.
+      mod.input(makeCtx(s, now, io), g, pid, s.settings.spicy ? d : maskInput(d));
       break;
     }
     default:
@@ -460,10 +479,17 @@ export function tick(s, now, io) {
   if (!mod) return;
   const ctx = makeCtx(s, now, io);
   if (g.phase === 'intro') {
-    if (now >= g.until) mod.begin(ctx, g);
+    if (now >= g.until) letsGo(ctx, g, mod);
     return;
   }
   mod.tick(ctx, g);
+}
+
+// The rules are done: "Ready? It's go time!" on the speaker and a splash on every phone.
+function letsGo(ctx, g, mod) {
+  g.go = ctx.now;
+  ctx.say('gen.go', { cut: true });
+  mod.begin(ctx, g);
 }
 
 // A selfie: small JPEG data URL, stored as a blob (faces outlive games, unlike game blobs).

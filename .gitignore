@@ -20,3 +20,13 @@ tools/tts/audition/
 tools/tts/refs/
 tools/tts/qa-report.json
 voice-samples/
+.env
+.env.local
+tools/tts/.env
+supabase/.temp/
+supabase/.branches/
+tools/tts/wav-eleven/
+tools/tts/audition-eleven/
+tools/tts/qa-eleven.json
+android-build.log
+android-build.err

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Privacy Policy · RiffRaff</title>
+    <link rel="stylesheet" href="legal.css" />
+  </head>
+  <body>
+    <main>
+      <p class="brand"><a href="./">RiffRaff</a></p>
+      <h1>Privacy Policy</h1>
+      <p class="updated">Last updated: October 5, 2026</p>
+
+      <p>RiffRaff is a party game you play with friends on your phones. We collect as little as possible. This policy explains what RiffRaff handles, why, and the choices you have.</p>
+
+      <h2>The short version</h2>
+      <ul>
+        <li>You can play without an account. Guests share nothing with us beyond what's needed to run a party.</li>
+        <li>Your selfie stays on your phone. It's only sent, end-to-end encrypted, to the parties you join, and it's removed when you leave.</li>
+        <li>We don't sell your data, show ads, or track you across other apps or websites.</li>
+        <li>If you create an account, you can delete it and its data at any time from inside the app.</li>
+      </ul>
+
+      <h2>When you play (no account needed)</h2>
+      <p>To play, you choose a nickname and a look for your avatar. Everything you send during a game (your nickname, avatar, answers, drawings, votes and, if you choose, your selfie) is encrypted on your phone with a key derived from the room code and relayed to the other players through public message relay services (currently EMQX, HiveMQ and shiftr.io). Those services only see encrypted data and cannot read it. Game data is temporary: it exists while the party runs and is cleared when players leave or a new game starts. We don't keep copies.</p>
+      <p>Your nickname, avatar and selfie are saved on your own device so you don't have to set them up again.</p>
+
+      <h2>If you create an account</h2>
+      <p>Signing in is optional. If you do, we store:</p>
+      <ul>
+        <li><strong>Your email address</strong> (or the private relay address Apple provides with Sign in with Apple) and an account ID, so you can sign in.</li>
+        <li><strong>Your nickname and avatar settings</strong>, so they follow you to other devices. Your selfie is never uploaded to your account.</li>
+        <li><strong>Your subscription status</strong>, so RiffRaff Premium works on all your devices.</li>
+      </ul>
+      <p>Accounts are stored with Supabase, our database and sign-in provider. If you sign in with Apple or Google, we receive your email address (or Apple's relay address) and basic profile details from them.</p>
+
+      <h2>Subscriptions</h2>
+      <p>RiffRaff Premium is sold through the App Store and Google Play. Apple and Google process your payment; we never see your payment details. We use RevenueCat to check whether your subscription is active. RevenueCat receives your purchase information and an anonymous ID (or your account ID if you're signed in).</p>
+
+      <h2>Camera and photos</h2>
+      <p>RiffRaff asks for camera access only when you choose to take a selfie for the face games. Photos you save from the game (drawings, wanted posters, contact sheets) go to your device through your phone's share sheet.</p>
+
+      <h2>Children</h2>
+      <p>RiffRaff is not directed at children under 13, and we don't knowingly collect personal information from them. If you believe a child has created an account, contact us and we'll delete it.</p>
+
+      <h2>Your choices and rights</h2>
+      <ul>
+        <li><strong>Delete your account:</strong> in the app, open Account, then Delete account. This permanently deletes your account, profile and subscription record. (Cancel an active subscription in your App Store or Google Play settings.)</li>
+        <li><strong>Remove your selfie:</strong> open your avatar and tap Remove.</li>
+        <li><strong>Access or correct your data:</strong> contact us and we'll help.</li>
+      </ul>
+      <p>Depending on where you live (for example the EU, UK or California), you may have additional rights, such as access, correction, deletion and objection. We honor them for everyone.</p>
+
+      <h2>Security</h2>
+      <p>Game traffic is encrypted end to end (AES-GCM). Account data is protected by access rules so only you can read your profile. No system is perfect, but we work to protect your information.</p>
+
+      <h2>Changes</h2>
+      <p>If we change this policy, we'll update the date above and, for significant changes, let you know in the app.</p>
+
+      <h2>Contact</h2>
+      <p id="contact">Questions or requests: see <a href="support.html">Help &amp; contact</a>.</p>
+    </main>
+    <script src="legal.js"></script>
+  </body>
+</html>

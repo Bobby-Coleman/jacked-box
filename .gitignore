@@ -30,3 +30,4 @@ tools/tts/audition-eleven/
 tools/tts/qa-eleven.json
 android-build.log
 android-build.err
+release/
